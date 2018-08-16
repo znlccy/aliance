@@ -2,14 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: Administrator
- * Date: 2018/8/15
- * Time: 14:22
- * Comment: 栏目模型
+ * Date: 2018/8/16
+ * Time: 10:46
+ * Comment: 分类模型
  */
 
 namespace app\admin\model;
 
-class Column extends BasisModel {
+class Category extends BasisModel {
 
     /**
      * 自动写入时间
@@ -21,5 +21,5 @@ class Column extends BasisModel {
      * 关联的数据表
      * @var string
      */
-    protected $table = 'tb_column';
+    protected $table = 'tb_category';
 }

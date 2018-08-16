@@ -232,4 +232,11 @@ class Group extends BasisController {
         }
     }
 
+    /**
+     * 获取下拉成员分组api接口
+     */
+    public function spinner() {
+
+    }
+
 }

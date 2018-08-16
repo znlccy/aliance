@@ -9,6 +9,10 @@
 
 namespace app\admin\controller;
 
+/**
+ * Class Activity
+ * @package app\admin\controller
+ */
 class Activity extends BasisController {
 
 }
