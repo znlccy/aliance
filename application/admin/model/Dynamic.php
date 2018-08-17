@@ -48,7 +48,7 @@ class Dynamic extends BasisModel {
      * 关联的数据表
      * @return array|\think\model\relation\HasOne
      */
-    public function lanmu() {
+    public function column() {
         return $this->hasOne('Column', 'id', 'column_id');
     }
 

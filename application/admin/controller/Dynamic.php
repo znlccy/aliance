@@ -138,8 +138,8 @@ class Dynamic extends BasisController {
         }
 
         //返回数据
-        $dynamic = $this->column_model->where($conditions)
-            ->with(['lanmu' => function ($query) {
+        $dynamic = $this->dynamic_model->where($conditions)
+            ->with(['column' => function ($query) {
                 $query->withField("id, name");
             }])
             ->order('id', 'desc')
