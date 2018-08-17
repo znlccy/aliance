@@ -170,10 +170,8 @@ class Dynamic extends BasisController {
         $publish_time = date('Y-m-d H:i:s', time());
         $status       = request()->param('status', 0);
         $rich_text    = request()->param('rich_text');
-        /*$admin        = Session::get('admin');*/
-        $admin = 'chen';
-        /*$publisher    = $admin['mobile'];*/
-        $publisher    = $admin;
+        $admin        = Session::get('admin');
+        $publisher    = $admin['mobile'];
 
         // 移动图片到框架应用根目录/public/images
         if ($picture) {

@@ -283,5 +283,10 @@ return [
     'pagination'            => [
         'PAGE_SIZE'         => 8,
         'JUMP_PAGE'         => 1
+    ],
+
+    //数据迁移
+    'migration' => [
+        'path' => ROOT_PATH .'vendor/gmars/tp5-rbac/'
     ]
 ];
