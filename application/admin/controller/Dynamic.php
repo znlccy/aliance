@@ -150,26 +150,30 @@ class Dynamic extends BasisController {
 
         return json([
             'code'      => '200',
-            'message'   => '获取冬天去爱列表成功',
+            'message'   => '获取动态列表成功',
             'data'      => $dynamic
         ]);
     }
 
+    /**
+     * 动态列表添加更新api接口
+     * @return \think\response\Json
+     */
     public function save() {
         /* 获取前端提交的数据 */
         $id           = request()->param('id');
-        $name         = request()->param('name');
+        $title        = request()->param('title');
         $description  = request()->param('description');
         $picture      = request()->file('picture');
         $column_id    = request()->param('column_id');
-        $price        = request()->param('price');
         $recommend    = request()->param('recommend', 0);
-        $address      = request()->param('address');
         $publish_time = date('Y-m-d H:i:s', time());
         $status       = request()->param('status', 0);
         $rich_text    = request()->param('rich_text');
-        $admin        = Session::get('admin');
-        $publisher    = $admin['mobile'];
+        /*$admin        = Session::get('admin');*/
+        $admin = 'chen';
+        /*$publisher    = $admin['mobile'];*/
+        $publisher    = $admin;
 
         // 移动图片到框架应用根目录/public/images
         if ($picture) {
@@ -185,13 +189,11 @@ class Dynamic extends BasisController {
         //验证数据
         $validate_data = [
             'id'            => $id,
-            'name'          => $name,
+            'title'         => $title,
             'description'   => $description,
             'picture'       => $picture,
             'column_id'     => $column_id,
-            'price'         => $price,
             'recommend'     => $recommend,
-            'address'       => $address,
             'publish_time'  => $publish_time,
             'status'        => $status,
             'publisher'     => $publisher,
@@ -223,6 +225,13 @@ class Dynamic extends BasisController {
         }
     }
 
+    /**
+     * 动态详情api接口
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function detail() {
         //获取客户端提交的数据
         $id = request()->param('id');
@@ -258,7 +267,8 @@ class Dynamic extends BasisController {
     }
 
     /**
-     * 删除动态api接口
+     * 动态删除api接口
+     * @return \think\response\Json
      */
     public function delete() {
 
@@ -314,5 +324,13 @@ class Dynamic extends BasisController {
                 'message'   => '获取栏目列表失败'
             ]);
         }
+    }
+
+    /**
+     * 获取富文本中第一张图片
+     */
+    protected function get_rich_image() {
+        /* 获取的时候通过php的htmlspecialchars_decode()函数将信息里的 &lt;内容转换成html的标记，再通过strip_tags()将html标记去除就可以获取到干净的内容了 */
+        $this->dynamic_model->getRichtextAttr();
     }
 }

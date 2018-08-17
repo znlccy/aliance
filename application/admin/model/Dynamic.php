@@ -43,7 +43,6 @@ class Dynamic extends BasisModel {
         return htmlspecialchars_decode($value);
     }
 
-
     /**
      * 关联的数据表
      * @return array|\think\model\relation\HasOne
