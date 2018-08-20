@@ -10,4 +10,10 @@ namespace app\admin\model;
 
 class RolePermission extends BasisModel {
 
+    /**
+     * 关联的数据表
+     * @var string
+     */
+    protected $table = 'tb_role_permission';
+
 }

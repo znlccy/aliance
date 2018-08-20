@@ -94,21 +94,91 @@ class Admin extends BasisController {
      * 管理员个人信息api接口
      */
     public function info() {
+        //获取用户手机
+        $admin = Session::get('admin');
+        //获取用户id
+        $id = $admin['id'];
 
+        //返回数据
+        if ($id) {
+            $admin_data = $this->admin_model->where('id', $id)->find();
+            return json([
+                'return'        => '200',
+                'message'       => '查询数据成功',
+                'data'          => $admin_data
+            ]);
+        } else {
+            return json([
+                'return'        => '404',
+                'message'       => '查询数据失败',
+            ]);
+        }
     }
 
     /**
-     * 管理员修改密码接口
+     * 管理员修改密码api接口
      */
     public function change_password() {
 
+        //获取客户端提交过来的数据
+        $password = request()->param('password');
+        $confirm_pass = request()->param('confirm_pass');
+
+        //验证数据
+        $validate_data = [
+            'password'      => $password,
+            'confirm_pass'  => $confirm_pass
+        ];
+
+        //验证结果
+        $result = $this->admin_validate->scene('info')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->admin_validate->getError()
+            ]);
+        }
+
+        //获取Session中的数据
+        $admin = Session::get('admin');
+        /*$id = $admin['id'];*/
+        $id = 1;
+
+        //返回数据
+        if ($id) {
+            $update_data = [
+                'password'      => md5($password)
+            ];
+            $this->admin_model->save($update_data, ['id' => $id]);
+            return json([
+                'code'      => '200',
+                'message'   => '更新密码成功'
+            ]);
+        } else {
+            return json([
+                'code'      => '404',
+                'message'   => '更新密码失败'
+            ]);
+        }
     }
 
     /**
-     * 管理员
+     * 管理员退出api接口
+     * @return \think\response\Json
      */
     public function logout() {
         Session::delete('admin');
         Session::delete('admin_token');
+        if (Session::get('admin') == null && Session::get('admin_token') == null) {
+            return json([
+                'code'      => '200',
+                'message'   => '管理员退出成功'
+            ]);
+        } else {
+            return json([
+                'code'      => '401',
+                'message'   => '管理员退出失败'
+            ]);
+        }
     }
 }

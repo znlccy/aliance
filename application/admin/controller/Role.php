@@ -13,6 +13,7 @@ use app\admin\validate\Role as RoleValidate;
 use app\admin\model\RolePermission as RolePermissionModel;
 use app\admin\model\Permission as PermissionModel;
 use think\Request;
+use gmars\rbac\Rbac;
 
 class Role extends BasisController {
 
@@ -65,7 +66,7 @@ class Role extends BasisController {
     public function entry() {
         /* 获取客户端提供的数据 */
         $id = request()->param('id');
-        $pid = request()->param('pid');
+        $parent_id = request()->param('parent_id');
         $status = request()->param('status');
         $name = request()->param('name');
         $description = request()->param('description');
@@ -83,7 +84,7 @@ class Role extends BasisController {
             'id'             => $id,
             'status'         => $status,
             'name'           => $name,
-            'pid'            => $pid,
+            'parent_id'      => $parent_id,
             'description'    => $description,
             'sort'           => $sort,
             'level'          => $level,
@@ -113,8 +114,8 @@ class Role extends BasisController {
         if ($name) {
             $conditions['name'] = ['like', '%' . $name . '%'];
         }
-        if ($pid) {
-            $conditions['pid'] = $pid;
+        if ($parent_id) {
+            $conditions['parent_id'] = $parent_id;
         }
         if ($description) {
             $conditions['description'] = ['like', '%' . $description . '%'];
@@ -134,6 +135,8 @@ class Role extends BasisController {
 
         //返回数据
         $role = $this->role_model->where($conditions)
+            ->order('sort', 'desc')
+            ->order('id', 'asc')
             ->paginate($page_size, false, ['page' => $jump_page]);
 
         return json([
@@ -146,12 +149,13 @@ class Role extends BasisController {
     /**
      * 添加更新角色api接口
      * @return \think\response\Json
+     * @throws \think\Exception
      */
     public function save() {
         /* 获取客户端提供的 */
         $id = request()->param('id');
         $name = request()->param('name');
-        $pid = request()->param('pid', 1);
+        $parent_id = request()->param('parent_id', 1);
         $level = request()->param('level', 1);
         $description = request()->param('description');
         $status = request()->param('status',1);
@@ -163,9 +167,10 @@ class Role extends BasisController {
             'name'          => $name,
             'description'   => $description,
             'status'        => $status,
-            'pid'           => $pid,
+            'parent_id'     => $parent_id,
             'sort'          => $sort,
-            'level'         => $level
+            'level'         => $level,
+            'create_time'   => date('Y-m-d H:i:s', time()),
         ];
 
         //验证结果
@@ -178,7 +183,17 @@ class Role extends BasisController {
         /* 封装用户数据为数组 */
 
         if (!empty($id)) {
-            $update_result = $rbac->editRole($validate_data);
+            $update_data = [
+                'id'            => $id,
+                'name'          => $name,
+                'description'   => $description,
+                'status'        => $status,
+                'parent_id'     => $parent_id,
+                'sort'          => $sort,
+                'level'         => $level,
+                'update_time'   => date('Y-m-d H:i:s', time()),
+            ];
+            $update_result = $rbac->editRole($update_data);
             if($update_result) {
                 return json([
                     'code'      => '200',
@@ -232,7 +247,7 @@ class Role extends BasisController {
         } else {
             return json([
                 'code'      => '404',
-                'message'   => '获取信息失败'
+                'message'   => '获取信息失败,数据不存在'
             ]);
         }
     }
@@ -328,7 +343,6 @@ class Role extends BasisController {
                 ]);
             }
         }
-
     }
 
     /**
@@ -339,12 +353,12 @@ class Role extends BasisController {
         $id = request()->param('id');
 
         //验证数据
-        $vatedate_data = [
+        $validate_data = [
             'id'    => $id
         ];
 
         //验证结果
-        $result   = $this->role_validate->scene('get_role_permission')->check($vatedate_data);
+        $result   = $this->role_validate->scene('get_role_permission')->check($validate_data);
         if (!$result) {
             return json(['code' => '401', 'message' => $this->role_validate->getError()]);
         }

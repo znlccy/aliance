@@ -68,7 +68,7 @@ class Activity extends BasisValidate {
 
     //验证场景
     protected $scene = [
-        'entry'         => [],
+        'entry'         => ['id' => 'number', ''],
         'save'          => ['id' => 'number', 'title' => 'require|max:80', 'content' => 'require', 'limit' => 'require|number|min:0', 'address' => 'require', 'location' => 'require', 'apply_time' => 'require|gt:end_time', 'begin_time' => 'require', 'end_time' => 'require|gt:begin_time', 'audit_method' => 'require'],
         'detail'        => ['id' => 'require|number'],
         'delete'        => ['id' => 'require|number']

@@ -54,6 +54,112 @@ class Activity extends BasisController {
      */
     public function entry() {
 
+        //接收客户端提交的数据e
+        $id = request()->param('id');
+        $title = request()->param('title');
+        $content = request()->param('content');
+        $recommend = request()->param('recommend');
+        $limit = request()->param('limit');
+        $register = request()->param('register');
+        $status = request()->param('status');
+        $address = request()->param('address');
+        $location = request()->param('location');
+        $apply_time_start = request()->param('apply_time_start');
+        $apply_time_end = request()->param('apply_time_end');
+        $begin_time_start = request()->param('begin_time_start');
+        $begin_time_end = request()->param('begin_time_end');
+        $end_time_start = request()->param('end_time_start');
+        $end_time_end = request()->param('end_time_end');
+        $page_size = request()->param('page_size', $this->activity_page['PAGE_SIZE']);
+        $jump_page = request()->param('jump_page', $this->activity_page['JUMP_PAGE']);
+
+        //验证数据
+        $validate_data = [
+            'id'            => $id,
+            'title'         => $title,
+            'content'       => $content,
+            'recommend'     => $recommend,
+            'limit'         => $limit,
+            'register'      => $register,
+            'status'        => $status,
+            'address'       => $address,
+            'location'      => $location,
+            'apply_time_start'=> $apply_time_start,
+            'apply_time_end'=> $apply_time_end,
+            'begin_time_start'=> $begin_time_start,
+            'begin_time_end'=> $begin_time_end,
+            'end_time_start' => $end_time_start,
+            'end_time_end'  => $end_time_end,
+            'page_size'     => $page_size,
+            'jump_page'     => $jump_page
+        ];
+
+        //验证结果
+        $result = $this->activity_validate->scene('entry')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->activity_validate->getError()
+            ]);
+        }
+
+        //筛选条件
+        $conditions = [];
+
+        if ($id) {
+            $conditions['id'] = $id;
+        }
+        if ($title) {
+            $conditions['title'] = ['like', '%' . $title . '%'];
+        }
+        if ($content) {
+            $conditions['content'] = ['like', '%' . $content .'%'];
+        }
+        if ($recommend || $recommend === 0) {
+            $conditions['recommend'] = $recommend;
+        }
+        if ($limit) {
+            $conditions['limit'] = $limit;
+        }
+        if ($register) {
+            $conditions['register'] = $register;
+        }
+        if ($status || $status === 0) {
+            $conditions['status'] = $status;
+        }
+        if ($address) {
+            $conditions['address'] = ['like', '%' . $address . '%'];
+        }
+        if ($location) {
+            $conditions['location'] = ['like', '%' . $location . '%'];
+        }
+        if ($apply_time_start && $apply_time_end) {
+            $conditions['apply_time'] = ['between time', [$apply_time_start, $apply_time_end]];
+        }
+        if ($begin_time_start && $begin_time_end) {
+            $conditions['begin_time'] = ['between time', [$begin_time_start, $begin_time_end]];
+        }
+        if ($end_time_start && $end_time_end) {
+            $conditions['end_time'] = ['between time', [$end_time_start, $end_time_end]];
+        }
+
+        //返回结果
+        $activity = $this->activity_model->where($conditions)
+            ->order('id', 'desc')
+            ->paginate($page_size, false, ['page' => $jump_page]);
+
+        if ($activity) {
+            return json([
+                'code'      => '200',
+                'message'   => '查询数据成功',
+                'data'      => $activity
+            ]);
+        } else {
+            return json([
+                'code'      => '404',
+                'message'   => '查询数据失败'
+            ]);
+        }
     }
 
     /**
