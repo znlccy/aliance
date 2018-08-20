@@ -27,6 +27,6 @@ class Admin extends BasisModel {
      * @return \think\model\relation\BelongsToMany
      */
     public function role() {
-        return $this->belongsToMany('Role', 'tb_admin_role', 'role_id', 'id');
+        return $this->belongsToMany('Role', 'tb_admin_role', 'role_id', 'admin_id');
     }
 }

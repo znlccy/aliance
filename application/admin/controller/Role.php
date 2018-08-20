@@ -363,14 +363,14 @@ class Role extends BasisController {
             return json(['code' => '401', 'message' => $this->role_validate->getError()]);
         }
 
-        $user_role = $this->role_permission_model-> where('role_id', '=', $id)-> select();
+        $user_role = $this->role_permission_model-> where('role_id', '=', $id)->select();
 
         $user_role_list = [];
         foreach ( $user_role as $value ){
             $user_role_list[] = $value['permission_id'];
         }
 
-        $role_data = $this->permission_model -> select();
+        $role_data = $this->permission_model->select();
         for ( $i = 0; $i < count($role_data); $i++ ){
             if (in_array($role_data[$i]['id'], $user_role_list)) {
                 $role_data[$i]['role_status'] = 1;
@@ -379,7 +379,7 @@ class Role extends BasisController {
             }
         }
 
-        $role_data = $this->buildTrees($role_data, 0);
+        $role_data = $this->buildTrees($role_data, 1);
 
         if ($role_data) {
             return json([
@@ -401,12 +401,17 @@ class Role extends BasisController {
      * @param $pId
      * @return array
      */
-    public function buildTrees($data, $pId)
-    {
+    /**
+     * 生成树结构函数
+     * @param $data
+     * @param $pId
+     * @return array
+     */
+    public function buildTrees($data, $pid) {
         $tree_nodes = array();
         foreach($data as $k => $v)
         {
-            if($v['pid'] == $pId)
+            if($v['pid'] == $pid)
             {
                 $v['child'] = $this->buildTrees($data, $v['id']);
                 $tree_nodes[] = $v;

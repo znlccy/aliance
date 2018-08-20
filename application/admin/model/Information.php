@@ -11,4 +11,10 @@ namespace app\admin\model;
 
 class Information extends BasisModel {
 
+    /**
+     * 关联的数据表
+     * @var string
+     */
+    protected $table = 'tb_information';
+
 }
