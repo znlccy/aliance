@@ -11,6 +11,12 @@ namespace app\index\model;
 class User extends BasicModel {
 
     /**
+     * 自动写入和读取时间
+     * @var string
+     */
+    protected $autoWriteTimestamp = 'datetime';
+
+    /**
      * @var string
      */
     protected $table = 'tb_user';
