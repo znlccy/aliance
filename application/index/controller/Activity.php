@@ -166,7 +166,7 @@ class Activity extends BasicController {
      */
     public function apply() {
         /* 获取客户端提交过来的用户信息 */
-        $active_id  = request()->param('id');
+        $activity_id  = request()->param('id');
         $username   = request()->param('username');
         $mobile     = request()->param('mobile');
         $email      = request()->param('email');
@@ -176,7 +176,7 @@ class Activity extends BasicController {
 
         /* 验证数据 */
         $validate_data = [
-            'active_id'  => $active_id,
+            'activity_id'=> $activity_id,
             'username'   => $username,
             'mobile'     => $mobile,
             'email'      => $email,
@@ -203,13 +203,13 @@ class Activity extends BasicController {
 
         // 判断用户是否已报名
         $user_id = session('user.id');
-        $active_result  = $this->user_activity_model->where(['user_id' => $user_id, 'active_id' => $active_id])->find();
+        $active_result  = $this->user_activity_model->where(['user_id' => $user_id, 'activity_id' => $activity_id])->find();
         if ($active_result) {
             return json(['code' => '400', 'message' => '您已报名该活动,无需重复提交']);
         }
 
         //获取活动消息
-        $active_info = $this->activity_model->where(['id' => $active_id])->find();
+        $active_info = $this->activity_model->where(['id' => $activity_id])->find();
 
         //整理活动状态
         $now_time = date('Y-m-d h:i:s', time());
@@ -235,18 +235,17 @@ class Activity extends BasicController {
             $user_active_status = 0;
         }
 
-        $data = ['user_id' => $user_id, 'active_id' => $active_id, 'register_time' => date("Y-m-d H:i:s", time()), 'status' => $user_active_status];
+        $data = ['user_id' => $user_id, 'activity_id' => $activity_id, 'register_time' => date("Y-m-d H:i:s", time()), 'status' => $user_active_status];
         $data = array_merge($data, $validate_data);
 
         //返回数据
         $result = $this->user_activity_model->insert($data);
         if ($result) {
             // 活动人数+1
-            $this->activity_model->where(['id' => $active_id])->setInc('register');
+            $this->activity_model->where(['id' => $activity_id])->setInc('register');
             return json(['code' => '200', 'message' => '提交成功']);
         } else {
             return json(['code' => '404', 'message' => '报名失败']);
         }
-
     }
 }

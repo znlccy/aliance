@@ -11,6 +11,7 @@ namespace app\index\controller;
 
 use app\index\model\Dynamic as DynamicModel;
 use app\index\validate\Dynamic as DynamicValidate;
+use app\index\model\Column as ColumnModel;
 use think\Controller;
 use think\Request;
 
@@ -21,6 +22,12 @@ class Dynamic extends Controller {
      * @var
      */
     protected $dynamic_model;
+
+    /**
+     * 声明栏目模型
+     * @var
+     */
+    protected $column_model;
 
     /**
      * 声明动态验证器
@@ -42,6 +49,7 @@ class Dynamic extends Controller {
     public function __construct(Request $request = null) {
         parent::__construct($request);
         $this->dynamic_model = new DynamicModel();
+        $this->column_model = new ColumnModel();
         $this->dynamic_validate = new DynamicValidate();
         $this->dynamic_page = config('pagination');
     }
@@ -138,5 +146,48 @@ class Dynamic extends Controller {
             'message'   => '获取信息成功',
             'data'      => $data
         ]);
+    }
+
+    /**
+     * 动态列表获取和分类
+     */
+    public function spinner() {
+
+        //接收客户端提交的数据
+        $column_id = request()->param('column_id');
+
+        //验证数据
+        $validate_data = [
+            'column_id'        => $column_id
+        ];
+
+        //验证结果
+        $result = $this->dynamic_validate->scene('spinner')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->dynamic_validate->getError()
+            ]);
+        }
+
+        //返回数据
+        if (empty($column_id)) {
+            $dynamic = $this->column_model->where('status = 1')->select();
+        } else {
+            $dynamic = $this->dynamic_model->where('column_id', $column_id)->where('status = 1')->select();
+        }
+        if (empty($dynamic)) {
+            return json([
+                'code'      => '404',
+                'message'   => '查询数据为空'
+            ]);
+        } else {
+            return json([
+                'code'      => '200',
+                'message'   => '查询信息成功',
+                'data'      => $dynamic
+            ]);
+        }
+
     }
 }

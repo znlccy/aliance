@@ -66,7 +66,7 @@ class User extends BasicValidate {
         'apply'             => ['page_size' => 'number', 'jump_page' => 'number'],
         'cancel'            => ['id' => 'require|number'],
         'modify_pass'       => ['old_password'   => 'require|length:8,25|alphaDash', 'password' => 'require|length:8,25|alphaDash|confirm:confirm_pass', 'confirm_pass'   => 'require|length:8,25|alphaDash'],
-        'notification'      => ['page_size' => 'require|number', 'jump_page' => 'require|number'],
+        'notification'      => ['page_size' => 'number', 'jump_page' => 'number'],
         'notification_detail' => ['id' => 'require|number'],
     ];
 }

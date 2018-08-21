@@ -10,7 +10,25 @@ namespace app\index\model;
 
 use think\Model;
 
-class Information extends Model
-{
-    //
+class Information extends Model {
+
+    /**
+     * 关联的数据表
+     * @var string
+     */
+    protected $table = 'tb_information';
+
+    public function setRichtextAttr($value)
+    {
+        return htmlspecialchars($value);
+    }
+
+    public function getRichtextAttr($value)
+    {
+        return htmlspecialchars_decode($value);
+    }
+    public function user()
+    {
+        return $this->hasOne('User', 'id', 'publisher');
+    }
 }

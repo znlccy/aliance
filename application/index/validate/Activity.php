@@ -19,7 +19,7 @@ class Activity extends BasicValidate {
         'id'                => 'number',
         'page_size'         => 'number',
         'jump_page'         => 'number',
-        'active_id'         => 'require',
+        'activity_id'       => 'require',
         'username'          => 'max:60',
         'mobile'            => 'number|length:11',
         'email'             => 'email',

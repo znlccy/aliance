@@ -16,6 +16,7 @@ class Dynamic extends BasicValidate {
         'id'                => 'number',
         'page_size'         => 'number',
         'jump_page'         => 'number',
+        'column_id'         => 'number',
     ];
 
     //验证消息
@@ -27,12 +28,14 @@ class Dynamic extends BasicValidate {
     protected $field = [
         'id'                => '动态主键',
         'page_size'         => '分页大小',
-        'jump_page'         => '跳转页'
+        'jump_page'         => '跳转页',
+        'column_id'         => '分栏主键'
     ];
 
     //验证场景
     protected $scene = [
         'index'             => ['page_size' => 'number', 'jump_page' => 'number'],
-        'detail'            => ['id' => 'require|number']
+        'detail'            => ['id' => 'require|number'],
+        'spinner'           => ['column_id' => 'number']
     ];
 }
