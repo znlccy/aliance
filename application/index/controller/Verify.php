@@ -9,8 +9,9 @@
 namespace app\index\controller;
 
 use think\captcha\Captcha;
+use think\Controller;
 
-class Verify extends BasicController {
+class Verify extends Controller {
 
     /**
      * 获取图形验证码api接口

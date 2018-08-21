@@ -10,6 +10,7 @@
 namespace app\admin\controller;
 
 use think\Controller;
+use think\Request;
 
 class BasisController extends Controller {
     // 用户id
@@ -45,7 +46,7 @@ class BasisController extends Controller {
                 /* 验证token */
                 // 获取客户端传来的token
                 $client_token = $request->header('admin_token');
-                if ( !(!empty($client_token) && $this->checkToken($client_token)) ) {
+                if ( !(!empty($client_token) && $this->check_token($client_token)) ) {
                     return $this->return_msg(401, '请先登录系统'); // session('admin_token')
                 }
                 $this->user_id = session('admin.id'); // 从session中获取  session('admin.id')
@@ -62,7 +63,7 @@ class BasisController extends Controller {
      * @param $client_token
      * @return bool
      */
-    public function checkToken($client_token) {
+    public function check_token($client_token) {
         if (Session::has('admin_token')){
             // 获取服务端存储的token
             $server_token = Session::get('admin_token');
