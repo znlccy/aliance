@@ -36,10 +36,10 @@ class Information extends BasisValidate {
         'status'        => '消息状态',
         'title'         => '消息标题',
         'publisher'     => '发布人',
-        'create_start'  => '栏目创建起始时间',
-        'create_end'    => '栏目创建截止时间',
-        'update_start'  => '栏目更新开始时间',
-        'update_end'    => '栏目更新截止时间',
+        'create_start'  => '消息创建起始时间',
+        'create_end'    => '消息创建截止时间',
+        'update_start'  => '消息更新开始时间',
+        'update_end'    => '消息更新截止时间',
         'page_size'     => '分页大小',
         'jump_page'     => '跳转页'
     ];

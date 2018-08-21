@@ -116,7 +116,7 @@ class Information extends BasisController {
             return json([
                 'code'      => '200',
                 'message'   => '查询数据成功',
-
+                'data'      => $information
             ]);
         } else {
             return json([
@@ -146,7 +146,7 @@ class Information extends BasisController {
             'status'       => $status,
             'publisher'    => $publisher,
             'publish_time' => $publish_time,
-            'rich_text'    => $rich_text,
+            'rich_text'    => $rich_text
         ];
 
         //验证结果
