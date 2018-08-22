@@ -85,6 +85,109 @@ function send_code($mobile)
     return $result;
 }
 
+function send_success_code($mobile)
+{
+    $config = Config::get('auth_pass_sms');
+
+    /* 发送的URL地址 */
+    $url = $config['url'];
+
+    /* 短信模板id */
+    $appid = $config['appid'];
+
+    /* 发送的手机号 */
+    $to = $mobile;
+
+    /* 要发送的验证码 */
+    $vars = json_encode([
+        'yId' => $mobile,
+    ]);
+
+    /* 发送的内容 */
+    $project = $config['project'];
+
+    /* 短信模板appkey */
+    $signature = $config['signature'];
+
+    /* 发送数据格式 */
+    /*$header = "Content-Type:application/json";*/
+
+    /* 封装发送的数据 */
+    $data = json_encode([
+        'appid'     => $appid,
+        'to'        => $to,
+        'project'   => $project,
+        'vars'       => $vars,
+        'signature' => $signature,
+    ]);
+
+    $result = http_post($url, $data);
+
+    if ($result) {
+        return json([
+            'code'      => '200',
+            'message'   => '发送成功'
+        ]);
+    } else {
+        return json([
+            'code'      => '404',
+            'message'   => '发送失败'
+        ]);
+    }
+}
+
+function send_fail_code($mobile, $reason)
+{
+    $config = Config::get('auth_fail_sms');
+
+    /* 发送的URL地址 */
+    $url = $config['url'];
+
+    /* 短信模板id */
+    $appid = $config['appid'];
+
+    /* 发送的手机号 */
+    $to = $mobile;
+
+    /* 要发送的验证码 */
+    $vars = json_encode([
+        'yId'   => $mobile,
+        'reason'=> $reason
+    ]);
+
+    /* 发送的内容 */
+    $project = $config['project'];
+
+    /* 短信模板appkey */
+    $signature = $config['signature'];
+
+    /* 发送数据格式 */
+    /*$header = "Content-Type:application/json";*/
+
+    /* 封装发送的数据 */
+    $data = json_encode([
+        'appid' => $appid,
+        'to' => $to,
+        'project' => $project,
+        'vars' => $vars,
+        'signature' => $signature,
+    ]);
+
+    $result = http_post($url, $data);
+
+    if ($result) {
+        return json([
+            'code' => '200',
+            'message' => '发送成功'
+        ]);
+    } else {
+        return json([
+            'code' => '404',
+            'message' => '发送失败'
+        ]);
+    }
+}
+
 /**
  * 发送post请求
  * @param $url

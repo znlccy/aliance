@@ -12,10 +12,9 @@ namespace app\index\controller;
 use app\index\model\Dynamic as DynamicModel;
 use app\index\validate\Dynamic as DynamicValidate;
 use app\index\model\Column as ColumnModel;
-use think\Controller;
 use think\Request;
 
-class Dynamic extends Controller {
+class Dynamic extends BasicController {
 
     /**
      * 声明动态模型

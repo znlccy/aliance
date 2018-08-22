@@ -22,4 +22,11 @@ class Group extends BasisModel {
      * @var string
      */
     protected $table = 'tb_group';
+
+    /**
+     * 关联用户表
+     */
+    public function user() {
+        return $this->hasMany('User','user_id', 'id');
+    }
 }

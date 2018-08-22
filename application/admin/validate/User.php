@@ -49,10 +49,12 @@ class User extends BasisValidate {
 
     //验证场景
     protected $scene = [
-        'user_list' => ['page_size' => 'number', 'jump_page' => 'number', 'id' => 'number', 'status' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'login_start' => 'date', 'login_end' => 'date'],
-        'create' => ['mobile' => 'require|length:11|regex:mobile', 'password' => 'require|alphaDash|length:8,25', 'confirm_pass' => 'require|alphaDash|length:8,25|confirm:password', 'username' => 'require|max:50', 'status' => 'require|number', 'email' => 'require|email', 'company' => 'require|max:255', 'career' => 'require|max:255', 'occupation' => 'require|max:255'],
+        'entry' => ['page_size' => 'number', 'jump_page' => 'number', 'id' => 'number', 'status' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'login_start' => 'date', 'login_end' => 'date'],
+        'create' => ['id' => 'number', 'mobile' => 'require|length:11|regex:mobile', 'password' => 'require|alphaDash|length:8,25', 'confirm_pass' => 'require|alphaDash|length:8,25|confirm:password'],
         'update' => ['id' => 'require|number','mobile' => 'regex:mobile|length:8', 'username' => 'max:255', 'status' => 'number', 'email' => 'email', 'company' => 'max:255', 'career' => 'max:255', 'occupation' => 'max:255'],
         'detail' => ['id' => 'require|number'],
         'delete' => ['id' => 'require|number'],
+        'agree'  => ['id' => 'require|array'],
+        'reject' => ['id' => 'require|array', 'reason' => 'require|min:6']
     ];
 }

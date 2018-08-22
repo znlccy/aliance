@@ -21,4 +21,23 @@ class Service extends BasicModel {
      * @var string
      */
     protected $table = 'tb_service';
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function setRichtextAttr($value)
+    {
+        return htmlspecialchars($value);
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getRichtextAttr($value)
+    {
+        return htmlspecialchars_decode($value);
+    }
+
 }
