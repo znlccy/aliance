@@ -11,6 +11,7 @@ namespace app\admin\controller;
 
 use app\admin\model\User as UserModel;
 use app\admin\model\Group as GroupModel;
+use app\admin\model\UserGroup as UserGroupModel;
 use app\admin\validate\User as UserValidate;
 use think\Controller;
 use think\Request;
@@ -28,6 +29,12 @@ class User extends Controller {
      * @var
      */
     protected $group_model;
+
+    /**
+     * 声明用户组模型
+     * @var
+     */
+    protected $user_group_model;
 
     /**
      * 声明用户验证器
@@ -50,6 +57,7 @@ class User extends Controller {
         parent::__construct($request);
         $this->user_model = new UserModel();
         $this->group_model = new GroupModel();
+        $this->user_group_model = new UserGroupModel();
         $this->user_validate = new UserValidate();
         $this->user_page = config('pagination');
     }
@@ -186,10 +194,101 @@ class User extends Controller {
     }
 
     /**
-     *
+     * 成员资料更新api接口
+     * @return \think\response\Json
      */
     public function save() {
+        //获取客户端提交的数据
+        $id = request()->param('id');
+        $company = request()->param('company');
+        $stage = request()->param('stage');
+        $website = request()->param('website');
+        $industry = request()->param('industry');
+        $legal_person = request()->param('legal_person');
+        $duty = request()->param('duty');
+        $mobile = request()->param('mobile');
+        $phone = request()->param('phone');
+        $email = request()->param('email');
+        $register_address = request()->param('register_address');
+        $business_license = request()->param('business_license');
+        $register_capital = request()->param('register_capital');
+        $license_scan = request()->file('license_scan');
+        // 移动图片到框架应用根目录/public/images
+        if ($license_scan) {
+            $info = $license_scan->move(ROOT_PATH . 'public' . DS . 'images');
+            if ($info) {
+                /*echo '文件保存的名:' . $info->getFilename();*/
+                $sub_path     = str_replace('\\', '/', $info->getSaveName());
+                $license_scan = '/images/' . $sub_path;
+            }
+        }
+        $mailing_address = request()->param('mailing_address');
+        $sales_volume = request()->param('sales_volume');
+        $total_people = request()->param('total_people');
+        $developer_people = request()->param('developer_people');
+        $patent = request()->param('patent');
+        $high_technology = request()->param('high_technology');
+        $service_direction = request()->param('service_direction');
+        $products_introduce = request()->param('products_introduce');
+        $business_introduce = request()->param('business_introduce');
+        $logo = request()->file('logo');
+        // 移动图片到框架应用根目录/public/images
+        if ($logo) {
+            $info = $logo->move(ROOT_PATH . 'public' . DS . 'images');
+            if ($info) {
+                /*echo '文件保存的名:' . $info->getFilename();*/
+                $sub_path     = str_replace('\\', '/', $info->getSaveName());
+                $logo = '/images/' . $sub_path;
+            }
+        }
 
+        //验证数据
+        $validate_data = [
+            'id'                => $id,
+            'company'           => $company,
+            'stage'             => $stage,
+            'website'           => $website,
+            'industry'          => $industry,
+            'legal_person'      => $legal_person,
+            'duty'              => $duty,
+            'mobile'            => $mobile,
+            'phone'             => $phone,
+            'email'             => $email,
+            'register_address'  => $register_address,
+            'business_license'  => $business_license,
+            'register_capital'  => $register_capital,
+            'license_scan'      => $license_scan,
+            'mailing_address'   => $mailing_address,
+            'sales_volume'      => $sales_volume,
+            'total_people'      => $total_people,
+            'developer_people'  => $developer_people,
+            'patent'            => $patent,
+            'high_technology'   => $high_technology,
+            'service_direction' => $service_direction,
+            'products_introduce'=> $products_introduce,
+            'business_introduce'=> $business_introduce,
+            'logo'              => $logo,
+            'update_time'       => date('Y-m-d H:s:i', time()),
+            'create_time'       => date('Y-m-d H:s:i', time())
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('apply')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+
+        //返回数据
+        $apply_result = $this->user_model->save($validate_data, ['id' => $id]);
+        if ($apply_result) {
+            return json([
+                'code'      => '200',
+                'message'   => '操作成功'
+            ]);
+        }
     }
 
     /**
@@ -264,105 +363,6 @@ class User extends Controller {
             return json([
                 'code'      => '401',
                 'message'   => '删除数据失败'
-            ]);
-        }
-    }
-
-    /**
-     * 联盟成员审核api接口
-     * @return \think\response\Json
-     */
-    public function apply() {
-
-        //获取客户端提交的数据
-        $id = request()->param('id');
-        $company = request()->param('company');
-        $stage = request()->param('stage');
-        $website = request()->param('website');
-        $industry = request()->param('industry');
-        $legal_person = request()->param('legal_person');
-        $duty = request()->param('duty');
-        $mobile = request()->param('mobile');
-        $phone = request()->param('phone');
-        $email = request()->param('email');
-        $register_address = request()->param('register_address');
-        $business_license = request()->param('business_license');
-        $register_capital = request()->param('register_capital');
-        $license_scan = request()->param('license_scan');
-        // 移动图片到框架应用根目录/public/images
-        if ($license_scan) {
-            $info = $license_scan->move(ROOT_PATH . 'public' . DS . 'images');
-            if ($info) {
-                /*echo '文件保存的名:' . $info->getFilename();*/
-                $sub_path     = str_replace('\\', '/', $info->getSaveName());
-                $license_scan = '/images/' . $sub_path;
-            }
-        }
-        $mailing_address = request()->param('mailing_address');
-        $sales_volume = request()->param('sales_volume');
-        $total_people = request()->param('total_people');
-        $developer_people = request()->param('developer_people');
-        $patent = request()->param('patent');
-        $high_technology = request()->param('high_technology');
-        $service_direction = request()->param('service_direction');
-        $products_introduce = request()->param('products_introduce');
-        $business_introduce = request()->param('business_introduce');
-        $logo = request()->param('logo');
-        // 移动图片到框架应用根目录/public/images
-        if ($logo) {
-            $info = $logo->move(ROOT_PATH . 'public' . DS . 'images');
-            if ($info) {
-                /*echo '文件保存的名:' . $info->getFilename();*/
-                $sub_path     = str_replace('\\', '/', $info->getSaveName());
-                $logo = '/images/' . $sub_path;
-            }
-        }
-
-        //验证数据
-        $validate_data = [
-            'company'           => $company,
-            'stage'             => $stage,
-            'website'           => $website,
-            'industry'          => $industry,
-            'legal_person'      => $legal_person,
-            'duty'              => $duty,
-            'mobile'            => $mobile,
-            'phone'             => $phone,
-            'email'             => $email,
-            'register_address'  => $register_address,
-            'business_license'  => $business_license,
-            'register_capital'  => $register_capital,
-            'license_scan'      => $license_scan,
-            'mailing_address'   => $mailing_address,
-            'sales_volume'      => $sales_volume,
-            'total_people'      => $total_people,
-            'developer_people'  => $developer_people,
-            'patent'            => $patent,
-            'high_technology'   => $high_technology,
-            'service_direction' => $service_direction,
-            'products_introduce'=> $products_introduce,
-            'business_introduce'=> $business_introduce,
-            'logo'              => $logo,
-            'update_time'       => date('Y-m-d H:s:i', time()),
-            'create_time'       => date('Y-m-d H:s:i', time())
-        ];
-
-        //验证结果
-        $result = $this->user_validate->scene('apply')->check($validate_data);
-        if (!$result) {
-            return json([
-                'code'      => '401',
-                'message'   => $this->user_validate->getError()
-            ]);
-        }
-
-        //返回数据
-        $apply_result = $this->user_model->insertGetId($validate_data);
-        if ($apply_result) {
-            return json([
-                'code'      => '200',
-                'message'   => '操作成功',
-                'data'      => $apply_result
             ]);
         }
     }
@@ -480,5 +480,111 @@ class User extends Controller {
                 'group'     => $group
             ]);
         }
+    }
+
+    /**
+     * 联盟成员添加api接口
+     */
+    public function add() {
+
+        //获取客户端提交的数据
+        $user_id = request()->param('user_id');
+        $group_id = request()->param('group_id');
+
+        //验证数据
+        $validate_data = [
+            'user_id'           => $user_id,
+            'group_id'          => $group_id
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('add')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+
+        $user = $this->user_group_model->where('user_id', $user_id)->find();
+        if ($user) {
+            return json([
+                'code'      => '401',
+                'message'   => '一个用户只能属于一个分组，一个分组可以有多个用户'
+            ]);
+        } else {
+            $operator_result = $this->user_group_model->save($validate_data);
+            if ($operator_result) {
+                return json([
+                    'code'      => '200',
+                    'message'   => '添加数据成功'
+                ]);
+            } else {
+                return json([
+                    'code'      => '401',
+                    'message'   => '添加数据失败'
+                ]);
+            }
+        }
+    }
+
+    /**
+     * 联盟成员展示api接口
+     * @return \think\response\Json
+     * @throws \think\exception\DbException
+     */
+    public function index() {
+
+        //接收客户端提供的数据
+        $user_id = request()->param('user_id');
+        $group_id = request()->param('group_id');
+        $create_start = request()->param('create_start');
+        $create_end = request()->param('create_end');
+        $page_size = request()->param('page_size', $this->user_page['PAGE_SIZE']);
+        $jump_page = request()->param('jump_page', $this->user_page['JUMP_PAGE']);
+
+        //验证数据
+        $validate_data = [
+            'user_id'       => $user_id,
+            'group_id'      => $group_id,
+            'create_start'  => $create_start,
+            'create_end'    => $create_end,
+            'page_size'     => $page_size,
+            'jump_page'     => $jump_page
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('index')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+
+        //筛选条件
+        $conditions = [];
+        if ($user_id) {
+            $conditions['user_id'] = $user_id;
+        }
+        if ($group_id) {
+            $conditions['group_id'] = $group_id;
+        }
+        if ($create_start && $create_end) {
+            $conditions['create_time'] = ['between time', [$create_start, $create_end]];
+        }
+        $data = $this->user_group_model
+            ->alias('gm')
+            ->where($conditions)
+            ->join('tb_user tu', 'tu.id = gm.user_id')
+            ->join('tb_group tg', 'tg.id = gm.group_id')
+            ->field('tu.company, tg.name, gm.create_time')
+            ->paginate($page_size, false, ['page' => $jump_page]);
+
+        return json([
+            'code'      => '200',
+            'message'   => '获取信息成功',
+            'data'      => $data
+        ]);
     }
 }

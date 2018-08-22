@@ -24,9 +24,9 @@ class Group extends BasisModel {
     protected $table = 'tb_group';
 
     /**
-     * 关联用户表
+     * @return BasisModel|void
      */
-    public function user() {
-        return $this->hasMany('User','user_id', 'id');
+    public function users() {
+        return $this->hasMany('UserGroup', 'user_id','group_id');
     }
 }

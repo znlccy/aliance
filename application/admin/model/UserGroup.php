@@ -2,14 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: Administrator
- * Date: 2018/8/15
- * Time: 14:33
- * Comment: 成员模型
+ * Date: 2018/8/22
+ * Time: 15:23
+ * Comment: 用户组模型
  */
 
 namespace app\admin\model;
 
-class User extends BasisModel {
+class UserGroup extends BasisModel {
 
     /**
      * 自动写入读取时间
@@ -17,15 +17,9 @@ class User extends BasisModel {
      */
     protected $autoWriteTimestamp = 'datetime';
 
-    protected $createTime = 'create_time';
-
-    protected $updateTime = 'update_time';
-
     /**
      * 关联的数据表
      * @var string
      */
-    protected $table = 'tb_user';
-
-
+    protected $table = 'tb_user_group';
 }
