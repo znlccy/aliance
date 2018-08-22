@@ -15,6 +15,8 @@ use app\index\model\UserInformation as UserInformationModel;
 use app\index\model\Information as InformationModel;
 use app\index\model\UserActivity as UserActivityModel;
 use app\index\model\Activity as ActivityModel;
+use app\index\model\Group as GroupModel;
+use app\index\model\UserGroup as UserGroupModel;
 use think\Controller;
 use think\Request;
 use think\Session;
@@ -58,6 +60,16 @@ class User extends Controller {
     protected $activity_model;
 
     /**
+     * @var
+     */
+    protected $group_model;
+
+    /**
+     * @var
+     */
+    protected $user_group_model;
+
+    /**
      * 声明用户验证器
      * @var
      */
@@ -82,6 +94,8 @@ class User extends Controller {
         $this->information_model = new InformationModel();
         $this->user_activity_model = new UserActivityModel();
         $this->activity_model = new ActivityModel();
+        $this->group_model = new GroupModel();
+        $this->user_group_model = new UserGroupModel();
         $this->user_page = config('pagination');
         $this->user_validate = new UserValidate();
     }
@@ -114,7 +128,9 @@ class User extends Controller {
             ->where('password', '=', md5($password))
             ->find();
 
-        if ( empty($user) ) {
+        $auditor = $user['auditor'];
+
+        if (empty($user) ) {
             return json(['code' => '404', 'message' => '数据库中还没有该用户或者输入的账号密码错误']);
         }
 
@@ -122,7 +138,7 @@ class User extends Controller {
         $token = general_token($mobile, $password);
         Session::set('access_token', $token);
 
-        return json(['code' => '200', 'message'   => '登录成功',  'access_token' => $token, 'mobile' => $mobile ]);
+        return json(['code' => '200', 'message'   => '登录成功',  'access_token' => $token, 'mobile' => $mobile, 'auditor' => $auditor]);
     }
 
     /**
@@ -622,9 +638,128 @@ class User extends Controller {
         }
     }
 
+    /**
+     * 用户成员列表
+     * @return mixed|void
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function index() {
+        $company = $this->user_group_model->alias('gm')
+            ->order('gm.group_id', 'desc')
+            ->join('tb_user tu', 'gm.user_id = tu.id')
+            ->join('tb_group tg', 'gm.group_id = tg.id')
+            ->select();
 
-    public function display() {
+        if ($company) {
+            return json([
+                'code'      => '200',
+                'message'   => '获取信息成功',
+                'data'      => $company
+            ]);
+        }
+    }
 
+    /**
+     * 用户保存个人资料
+     * @return \think\response\Json
+     */
+    public function save() {
+        //获取客户端提交的数据
+        $id = request()->param('id');
+        $company = request()->param('company');
+        $stage = request()->param('stage');
+        $website = request()->param('website');
+        $industry = request()->param('industry');
+        $legal_person = request()->param('legal_person');
+        $duty = request()->param('duty');
+        $mobile = request()->param('mobile');
+        $phone = request()->param('phone');
+        $email = request()->param('email');
+        $register_address = request()->param('register_address');
+        $business_license = request()->param('business_license');
+        $register_capital = request()->param('register_capital');
+        $license_scan = request()->file('license_scan');
+        // 移动图片到框架应用根目录/public/images
+        if ($license_scan) {
+            $info = $license_scan->move(ROOT_PATH . 'public' . DS . 'images');
+            if ($info) {
+                /*echo '文件保存的名:' . $info->getFilename();*/
+                $sub_path     = str_replace('\\', '/', $info->getSaveName());
+                $license_scan = '/images/' . $sub_path;
+            }
+        }
+        $mailing_address = request()->param('mailing_address');
+        $sales_volume = request()->param('sales_volume');
+        $total_people = request()->param('total_people');
+        $developer_people = request()->param('developer_people');
+        $patent = request()->param('patent');
+        $high_technology = request()->param('high_technology');
+        $service_direction = request()->param('service_direction');
+        $products_introduce = request()->param('products_introduce');
+        $business_introduce = request()->param('business_introduce');
+        $logo = request()->file('logo');
+        // 移动图片到框架应用根目录/public/images
+        if ($logo) {
+            $info = $logo->move(ROOT_PATH . 'public' . DS . 'images');
+            if ($info) {
+                /*echo '文件保存的名:' . $info->getFilename();*/
+                $sub_path     = str_replace('\\', '/', $info->getSaveName());
+                $logo = '/images/' . $sub_path;
+            }
+        }
+
+        //验证数据
+        $validate_data = [
+            'id'                => $id,
+            'company'           => $company,
+            'stage'             => $stage,
+            'website'           => $website,
+            'industry'          => $industry,
+            'legal_person'      => $legal_person,
+            'duty'              => $duty,
+            'mobile'            => $mobile,
+            'phone'             => $phone,
+            'email'             => $email,
+            'register_address'  => $register_address,
+            'business_license'  => $business_license,
+            'register_capital'  => $register_capital,
+            'license_scan'      => $license_scan,
+            'mailing_address'   => $mailing_address,
+            'sales_volume'      => $sales_volume,
+            'total_people'      => $total_people,
+            'developer_people'  => $developer_people,
+            'patent'            => $patent,
+            'high_technology'   => $high_technology,
+            'service_direction' => $service_direction,
+            'products_introduce'=> $products_introduce,
+            'business_introduce'=> $business_introduce,
+            'logo'              => $logo,
+            'update_time'       => date('Y-m-d H:s:i', time()),
+            'create_time'       => date('Y-m-d H:s:i', time())
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('apply')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+        if (empty($id)) {
+            $apply_result = $this->user_model->save($validate_data);
+        } else {
+            $apply_result = $this->user_model->save($validate_data, ['id' => $id]);
+        }
+        //返回数据
+        if ($apply_result) {
+            return json([
+                'code'      => '200',
+                'message'   => '操作成功'
+            ]);
+        }
     }
 
 }
