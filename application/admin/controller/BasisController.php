@@ -11,8 +11,11 @@ namespace app\admin\controller;
 
 use think\Controller;
 use think\Request;
+use think\Session;
+use gmars\rbac\Rbac;
 
-class BasisController extends Controller {
+class BasisController extends Controller
+{
     // 用户id
     protected $user_id = 0;
     // 当前访问权限名称
@@ -27,7 +30,8 @@ class BasisController extends Controller {
     protected  $except_auth = [
         'Admin' => ['login', 'account_login', 'role', 'mobile_login'],
         'Information' => ['publisher'],
-        'Service' => ['category']
+        'Service' => ['category'],
+        'Image' => ['upload']
     ];
 
     public function __construct(Request $request = null)
@@ -36,6 +40,7 @@ class BasisController extends Controller {
         $this->module = $request->module();
         $this->controller = $request->controller();
         $this->action = $request->action();
+//        $this->permission = strtolower('/'. $this->module . '/' . $this->controller . '/' . $this->action);
         $this->permission = preg_replace('/\?.*$/U', '', $request->url());
         //过滤不需要登陆的行为
         if (isset($this->except_auth[$this->controller]) && in_array($this->action, $this->except_auth[$this->controller])) {
@@ -45,21 +50,21 @@ class BasisController extends Controller {
             if (session('?admin')) {
                 /* 验证token */
                 // 获取客户端传来的token
-                $client_token = $request->header('admin_token');
+                $client_token = $request->header('access-token');
                 if ( !(!empty($client_token) && $this->check_token($client_token)) ) {
-                    return $this->return_msg(401, '请先登录系统'); // session('admin_token')
+                    return $this->returnMsg(401, '请先登录系统'); // session('admin_token')
                 }
                 $this->user_id = session('admin.id'); // 从session中获取  session('admin.id')
                 //检查管理员操作权限
                 $this->checkPriv();
             } else {
-                return $this->return_msg(401, '请先登录系统');
+                return $this->returnMsg(401, '请先登录系统');
             }
         }
     }
 
     /**
-     * Token验证
+     * token验证
      * @param $client_token
      * @return bool
      */
@@ -90,7 +95,7 @@ class BasisController extends Controller {
             $rbacObj = new Rbac();
             $rbacObj->cachePermission($this->user_id);
             if (!$rbacObj->can($this->permission)) {
-                return $this->return_msg(404, '没有操作权限');
+                return $this->returnMsg(404, '没有操作权限');
             }
         }
     }
@@ -100,7 +105,7 @@ class BasisController extends Controller {
      * @param string $msg
      * @param array $data
      */
-    public function return_msg($code, $msg = '', $data = []) {
+    public function returnMsg($code, $msg = '', $data = []) {
 
         $return_data['code'] = $code;
         $return_data['message'] = $msg;
@@ -111,4 +116,5 @@ class BasisController extends Controller {
         echo json_encode($return_data);
         die;
     }
+
 }

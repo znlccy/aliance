@@ -258,7 +258,7 @@ class Admin extends BasisController {
         //返回数据
         $admin_data = $this->admin_model->where($conditions)
             ->with(['role' => function($query){
-                $query->withField('id, name');
+                $query->withField("id, name");
             }])->paginate($page_size, false, ['page' => $jump_page]);
 
         return json([

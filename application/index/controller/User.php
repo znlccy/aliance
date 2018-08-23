@@ -646,6 +646,7 @@ class User extends Controller {
      * @throws \think\exception\DbException
      */
     public function index() {
+
         $company = $this->user_group_model->alias('gm')
             ->order('gm.group_id', 'desc')
             ->join('tb_user tu', 'gm.user_id = tu.id')

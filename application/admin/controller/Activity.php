@@ -59,8 +59,10 @@ class Activity extends BasisController {
         $title = request()->param('title');
         $content = request()->param('content');
         $recommend = request()->param('recommend');
-        $limit = request()->param('limit');
-        $register = request()->param('register');
+        $limit_start = request()->param('limit_start');
+        $limit_end = request()->param('limit_end');
+        $register_start = request()->param('register_start');
+        $register_end = request()->param('register_end');
         $status = request()->param('status');
         $address = request()->param('address');
         $location = request()->param('location');
@@ -79,8 +81,10 @@ class Activity extends BasisController {
             'title'         => $title,
             'content'       => $content,
             'recommend'     => $recommend,
-            'limit'         => $limit,
-            'register'      => $register,
+            'limit_start'   => $limit_start,
+            'limit_end'     => $limit_end,
+            'register_start'=> $register_start,
+            'register_end'  => $register_end,
             'status'        => $status,
             'address'       => $address,
             'location'      => $location,
@@ -118,11 +122,11 @@ class Activity extends BasisController {
         if ($recommend || $recommend === 0) {
             $conditions['recommend'] = $recommend;
         }
-        if ($limit) {
-            $conditions['limit'] = $limit;
+        if ($limit_start && $limit_end) {
+            $conditions['limit'] = ['between', [$limit_start, $limit_end]];
         }
-        if ($register) {
-            $conditions['register'] = $register;
+        if ($register_start && $register_end) {
+            $conditions['register'] = ['between', [$register_start, $register_end]];
         }
         if ($status || $status === 0) {
             $conditions['status'] = $status;
