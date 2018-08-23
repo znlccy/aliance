@@ -379,7 +379,7 @@ class Role extends BasisController {
             }
         }
 
-        $role_data = $this->buildTrees($role_data, 1);
+        $role_data = $this->buildTrees($role_data, 0);
 
         if ($role_data) {
             return json([
