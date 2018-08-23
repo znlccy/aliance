@@ -11,6 +11,7 @@ namespace app\admin\controller;
 
 use app\admin\model\Activity as ActivityModel;
 use app\admin\validate\Activity as ActivityValidate;
+use app\admin\model\UserActivity as UserActivityModel;
 use think\Request;
 
 /**
@@ -24,6 +25,12 @@ class Activity extends BasisController {
      * @var
      */
     protected $activity_model;
+
+    /**
+     * 声明用户活动模型
+     * @var
+     */
+    protected $user_activity_model;
 
     /**
      * 声明活动验证器
@@ -45,6 +52,7 @@ class Activity extends BasisController {
     public function __construct(Request $request = null) {
         parent::__construct($request);
         $this->activity_model = new ActivityModel();
+        $this->user_activity_model = new UserActivityModel();
         $this->activity_validate = new ActivityValidate();
         $this->activity_page = config('pagination');
     }
@@ -314,6 +322,73 @@ class Activity extends BasisController {
                 'code'      => '401',
                 'message'   => '删除数据失败'
             ]);
+        }
+    }
+
+    /**
+     * 活动报名列表api接口
+     */
+    public function apply_entry() {
+
+        /* 获取客户端提供的数据 */
+        $page_size = request()->param('page_size/d', $this->activity_page['PAGE_SIZE']);
+        $jump_page = request()->param('jump_page/d', $this->activity_page['JUMP_PAGE']);
+        $id = request()->param('id');
+
+        /* 验证数据 */
+        $data = [
+            'page_size'        => $page_size,
+            'jump_page'        => $jump_page,
+            'id'               => $id,
+        ];
+
+        //验证结果
+        $result   = $this->activity_validate->scene('apply_entry')->check($data);
+        if (!$result) {
+            return json(['code' => '401', 'message' => $this->activity_validate->getError()]);
+        }
+
+        //返回数据
+        $activity_data = $this->user_activity_model-> where('activity_id', '=', $id)
+            -> alias('au')
+            -> join('tb_user u', 'au.user_id = u.id')
+            -> field('au.user_id, u.mobile, au.activity_id, au.status, au.apply_time, u.mobile, u.email, u.industry, u.occupation, u.company')
+            ->paginate($page_size, false, ['page' => $jump_page]);
+        if ($result) {
+            return json(['code' => '200', 'message' => '查询成功', 'data' => $activity_data]);
+        } else {
+            return json(['code' => '404', 'message' => '查询失败']);
+        }
+
+    }
+
+    /**
+     * 活动报名审核api接口
+     */
+    public function auditor() {
+
+        //接收客户端提交过来的数据
+        $activity_id     = request()->param('id');
+        $status = request()->param('status', 1);
+
+        /* 验证规则 */
+        $data = [
+            'activity_id'   => $activity_id,
+            'status'        => $status
+        ];
+
+        //验证结果
+        $result   = $this->activity_validate->scene('auditor')->check($data);
+        if (!$result) {
+            return json(['code' => '401', 'message' => $this->activity_validate->getError()]);
+        }
+
+        //返回结果
+        $activity_data = $this->user_activity_model->save($data,['activity_id' => $activity_id]);
+        if ($activity_data) {
+            return json(['code' => '200', 'message' => '审核通过']);
+        } else {
+            return json(['code' => '404', 'message' => '审核失败']);
         }
     }
 }

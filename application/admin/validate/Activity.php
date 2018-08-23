@@ -44,6 +44,7 @@ class Activity extends BasisValidate {
     //验证字段
     protected $field = [
         'id'            => '活动主键',
+        'activity_id'   => '活动主键',
         'title'         => '活动标题',
         'content'       => '活动内容',
         'picture'       => '活动图片',
@@ -71,6 +72,8 @@ class Activity extends BasisValidate {
         'entry'         => ['id' => 'number', ''],
         'save'          => ['id' => 'number', 'title' => 'require|max:80', 'content' => 'require', 'limit' => 'require|number|min:0', 'address' => 'require', 'location' => 'require', 'apply_time' => 'require|gt:end_time', 'begin_time' => 'require', 'end_time' => 'require|gt:begin_time', 'audit_method' => 'require'],
         'detail'        => ['id' => 'require|number'],
-        'delete'        => ['id' => 'require|number']
+        'delete'        => ['id' => 'require|number'],
+        'apply_entry'   => ['id' => 'require|number', 'page_size' => 'number', 'jump_page' => 'number'],
+        'auditor'       => ['activity_id' => 'require|number', 'status' => 'require|number|in:0,1,2']
     ];
 }
