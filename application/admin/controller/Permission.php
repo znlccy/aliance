@@ -63,7 +63,7 @@ class Permission extends BasisController {
         $id = $admin['id'];
         $node = $this->admin_role_model->alias('ar')
             ->where('level', '<>', '3')
-            ->where('ar.admin_id', '=', $id)
+            ->where('ar.user_id', '=', $id)
             ->where('status', '=', '1')
             ->join('tb_role_permission rp', 'ar.role_id = rp.role_id')
             ->join('tb_permission tp', 'tp.id = rp.permission_id')
