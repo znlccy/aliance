@@ -78,7 +78,8 @@ class Service extends Controller {
         $name = request()->param('name');
         $description = request()->param('description');
         $category_id = request()->param('category_id');
-        $price = request()->param('price');
+        $price_start = request()->param('price_start');
+        $price_end = request()->param('price_end');
         $recommend = request()->param('recommend');
         $status = request()->param('status');
         $address = request()->param('address');
@@ -97,7 +98,8 @@ class Service extends Controller {
             'name'          => $name,
             'description'   => $description,
             'category_id'   => $category_id,
-            'price'         => $price,
+            'price_start'   => $price_start,
+            'price_end'     => $price_end,
             'recommend'     => $recommend,
             'status'        => $status,
             'address'       => $address,
@@ -134,8 +136,8 @@ class Service extends Controller {
         if ($category_id) {
             $conditions['category_id'] = $category_id;
         }
-        if ($price) {
-            $conditions['price'] = $price;
+        if ($price_start && $price_end) {
+            $conditions['price'] = ['between',[$price_start, $price_end]];
         }
         if ($recommend) {
             $conditions['recommend'] = $recommend;

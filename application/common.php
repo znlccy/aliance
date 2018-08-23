@@ -12,7 +12,6 @@
 // 应用公共文件
 use think\captcha\Captcha;
 use think\Config;
-use think\Db;
 use app\index\model\Sms as SmsModel;
 /**
  * 发送短信业务
