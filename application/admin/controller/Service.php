@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\index\controller\BasicController;
 use think\Controller;
 use think\Request;
 use app\admin\model\Service as ServiceModel;
@@ -10,7 +11,7 @@ use app\admin\model\Category as CategoryModel;
 /**
  * @title 服务资源管理
  */
-class Service extends Controller {
+class Service extends BasicController {
 
     /**
      * 声明服务模型

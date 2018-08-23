@@ -9,9 +9,9 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\index\controller\BasicController;
 
-class Image extends Controller {
+class Image extends BasicController {
 
     public function upload(){
 

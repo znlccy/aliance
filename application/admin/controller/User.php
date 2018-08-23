@@ -13,10 +13,9 @@ use app\admin\model\User as UserModel;
 use app\admin\model\Group as GroupModel;
 use app\admin\model\UserGroup as UserGroupModel;
 use app\admin\validate\User as UserValidate;
-use think\Controller;
 use think\Request;
 
-class User extends Controller {
+class User extends BasisController {
 
     /**
      * 声明用户模型
@@ -94,7 +93,7 @@ class User extends Controller {
         $operator_data = [
             'id'            => $id,
             'mobile'        => $mobile,
-            'password'      => $password
+            'password'      => md5($password)
         ];
 
         //返回数据
@@ -170,6 +169,81 @@ class User extends Controller {
         if ($auditor || $auditor === 0) {
             $conditions['auditor'] = $auditor;
         }
+        if ($status || $status === 0) {
+            $conditions['status'] = $status;
+        }
+
+        //返回结果
+        $user = $this->user_model->where($conditions)
+            ->field('id, mobile, create_time, login_time, auditor, status')
+            ->paginate($page_size, false, ['jump_page' => $jump_page]);
+
+        if ($user) {
+            return json([
+                'code'      => '200',
+                'message'   => '查询信息成功',
+                'data'      => $user
+            ]);
+        } else {
+            return json([
+                'code'      => '404',
+                'message'   => '查询信息失败'
+            ]);
+        }
+    }
+
+    /**
+     *
+     */
+    public function wait_auditor_entry() {
+        //接收客户端提交的数据
+        $id = request()->param('id');
+        $mobile = request()->param('mobile');
+        $create_start = request()->param('create_start');
+        $create_end = request()->param('create_end');
+        $login_start = request()->param('login_start');
+        $login_end = request()->param('login_end');
+        $status = request()->param('status');
+        $page_size = request()->param('page_size', $this->user_page['PAGE_SIZE']);
+        $jump_page = request()->param('jump_page', $this->user_page['JUMP_PAGE']);
+
+        //验证数据
+        $validate_data = [
+            'id'            => $id,
+            'mobile'        => $mobile,
+            'create_start'  => $create_start,
+            'create_end'    => $create_end,
+            'login_start'   => $login_start,
+            'login_end'     => $login_end,
+            'status'        => $status,
+            'page_size'     => $page_size,
+            'jump_page'     => $jump_page
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('entry')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+
+        //筛选条件
+        $conditions = [];
+        if ($id) {
+            $conditions['id'] = $id;
+        }
+        if ($mobile) {
+            $conditions['mobile'] = $mobile;
+        }
+        if ($create_start && $create_end) {
+            $conditions['create_time'] = ['between time', [$create_start, $create_end]];
+        }
+        if ($login_start && $login_end) {
+            $conditions['update_time'] = ['between time', [$login_start, $login_end]];
+        }
+        $conditions['auditor'] = 1;
         if ($status || $status === 0) {
             $conditions['status'] = $status;
         }
@@ -372,64 +446,21 @@ class User extends Controller {
      * @return \think\response\Json
      * @throws \think\exception\DbException
      */
-    public function agree() {
+    public function auditor() {
         //接收客户端提交过来的数据
         $id = request()->param('id/a');
-
-        //验证数据
-        $validate_data = [
-            'id'        => $id
-        ];
-
-        //验证结果
-        $result = $this->user_validate->scene('agree')->check($validate_data);
-        if (!$result) {
-            return json([
-                'code'      => '401',
-                'message'   => $this->user_validate->getError()
-            ]);
-        }
-
-        //更新数据
-        $operator_result = false;
-        for($i=0; $i< count($id); $i++) {
-            $data['id'] = (int)$id[$i];
-            $data['auditor'] = 1;
-            $operator_result = $this->user_model->update($data);
-        }
-
-        //发送通知
-        $list = UserModel::all($id);
-        foreach ($list as $key => $user) {
-            send_success_code($user->mobile);
-        }
-        //添加短信提醒
-        if ($operator_result) {
-            return json([
-                'code'      => '200',
-                'message'   => '授权成功'
-            ]);
-        }
-    }
-
-    /**
-     * 联盟成员拒绝api接口
-     * @return \think\response\Json
-     * @throws \think\exception\DbException
-     */
-    public function reject() {
-        //接收客户端提交过来的数据
-        $id = request()->param('id/a');
+        $type_id = intval(request()->param('type_id'));
         $reason = request()->param('reason');
 
         //验证数据
         $validate_data = [
             'id'        => $id,
+            'type_id'   => $type_id,
             'reason'    => $reason
         ];
 
         //验证结果
-        $result = $this->user_validate->scene('reject')->check($validate_data);
+        $result = $this->user_validate->scene('auditor')->check($validate_data);
         if (!$result) {
             return json([
                 'code'      => '401',
@@ -439,22 +470,61 @@ class User extends Controller {
 
         //更新数据
         $operator_result = false;
-        for($i=0; $i< count($id); $i++) {
-            $data['id'] = (int)$id[$i];
-            $data['auditor'] = 0;
-            $operator_result = $this->user_model->update($data);
-        }
-
         //发送通知
         $list = UserModel::all($id);
-        foreach ($list as $key => $user) {
-            send_fail_code($user->mobile,$reason);
+        switch ($type_id) {
+            case 0:
+                for($i=0; $i< count($id); $i++) {
+                    $data['id'] = (int)$id[$i];
+                    $data['auditor'] = 0;
+                    $operator_result = $this->user_model->update($data);
+                }
+                //发送短信提醒
+                foreach ($list as $key => $user) {
+                    send_fail_code($user->mobile,$reason);
+                }
+                //添加短信提醒
+                if ($operator_result) {
+                    return json([
+                        'code'      => '200',
+                        'message'   => '拒绝成功'
+                    ]);
+                }
+                break;
+            case 1:
+                for($i=0; $i< count($id); $i++) {
+                    $data['id'] = (int)$id[$i];
+                    $data['auditor'] = 2;
+                    $operator_result = $this->user_model->update($data);
+                }
+                //发送通知
+                foreach ($list as $key => $user) {
+                    send_success_code($user->mobile);
+                }
+                //添加短信提醒
+                if ($operator_result) {
+                    return json([
+                        'code'      => '200',
+                        'message'   => '授权成功'
+                    ]);
+                }
         }
-        //添加短信提醒
-        if ($operator_result) {
+    }
+
+    /**
+     * 获取下拉成员api接口
+     */
+    public function company_spinner() {
+
+        //查询数据
+        $company = $this->user_model->where('auditor = 2')->field('id,company')->select();
+
+        //返回数据
+        if ($company) {
             return json([
                 'code'      => '200',
-                'message'   => '拒绝成功'
+                'message'   => '获取公司下拉列表成功',
+                'company'   => $company
             ]);
         }
     }
@@ -462,22 +532,20 @@ class User extends Controller {
     /**
      * 获取下拉成员分组api接口
      */
-    public function spinner() {
-        $company = $this->user_model->where('auditor = 1')->field('company')->select();
+    public function group_spinner() {
+
+        //查询数据
         $group = $this->group_model->order('sort', 'desc')
             ->order('id', 'asc')
             ->field('id, name')
             ->select();
 
         //返回数据
-        $data = array_merge($company, $group);
-
-        if ($company && $group) {
+        if ($group) {
             return json([
                 'code'      => '200',
-                'message'   => '获取下拉列表成功',
-                'company'   => $company,
-                'group'     => $group
+                'message'   => '获取分组下拉列表成功',
+                'group'   => $group
             ]);
         }
     }

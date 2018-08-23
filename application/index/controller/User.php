@@ -17,11 +17,10 @@ use app\index\model\UserActivity as UserActivityModel;
 use app\index\model\Activity as ActivityModel;
 use app\index\model\Group as GroupModel;
 use app\index\model\UserGroup as UserGroupModel;
-use think\Controller;
 use think\Request;
 use think\Session;
 
-class User extends Controller {
+class User extends BasicController {
 
     /**
      * 声明用户模型
@@ -736,6 +735,7 @@ class User extends Controller {
             'service_direction' => $service_direction,
             'products_introduce'=> $products_introduce,
             'business_introduce'=> $business_introduce,
+            'auditor'           => 1,
             'logo'              => $logo,
             'update_time'       => date('Y-m-d H:s:i', time()),
             'create_time'       => date('Y-m-d H:s:i', time())
