@@ -100,7 +100,12 @@ class User extends BasisController {
         if (empty($id)) {
             $operator_result = $this->user_model->save($operator_data);
         } else {
-            $operator_result = $this->user_model->save($operator_data, ['id' => $id]);
+            if (!empty($password) && !empty($confirm_pass)) {
+                //如果用户id不为空， 不能修改用户手机和密码，待解决
+                $operator_result = true;
+            } else {
+                $operator_result = false;
+            }
         }
         if ($operator_result) {
             return json([
