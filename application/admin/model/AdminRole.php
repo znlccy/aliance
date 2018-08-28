@@ -11,6 +11,12 @@ namespace app\admin\model;
 class AdminRole extends BasisModel {
 
     /**
+     * 自动获取写入时间
+     * @var string
+     */
+    protected $autoWriteTimestamp = 'datetime';
+
+    /**
      * 关联的数据表
      * @var string
      */
