@@ -73,15 +73,23 @@ class User extends BasisController {
         $confirm_pass = request()->param('confirm_pass');
 
         //验证数据
-        $validate_data = [
-            'id'            => $id,
-            'mobile'        => $mobile,
-            'password'      => $password,
-            'confirm_pass'  => $confirm_pass
-        ];
+        if (empty($id)) {
+            $validate_data = [
+                'mobile'        => $mobile,
+                'password'      => $password,
+                'confirm_pass'  => $confirm_pass
+            ];
+            $result = $this->user_validate->scene('create')->check($validate_data);
+        } else {
+            $validate_data = [
+                'id'            => $id,
+                'password'      => $password,
+                'confirm_pass'  => $confirm_pass
+            ];
+            $result = $this->user_validate->scene('modify')->check($validate_data);
+        }
 
         //验证结果
-        $result = $this->user_validate->scene('create')->check($validate_data);
         if (!$result) {
             return json([
                 'code'      => '401',
@@ -102,7 +110,11 @@ class User extends BasisController {
         } else {
             if (!empty($password) && !empty($confirm_pass)) {
                 //如果用户id不为空， 不能修改用户手机和密码，待解决
-                $operator_result = true;
+                $update_data = [
+                    'id'            => $id,
+                    'password'      => md5($password)
+                ];
+                $operator_result = $this->user_model->save($update_data,['id' => $id]);;
             } else {
                 $operator_result = false;
             }
@@ -113,7 +125,6 @@ class User extends BasisController {
                 'message'   => '数据操作成功'
             ]);
         }
-
     }
 
     /**
@@ -171,11 +182,36 @@ class User extends BasisController {
         if ($login_start && $login_end) {
             $conditions['update_time'] = ['between time', [$login_start, $login_end]];
         }
-        if ($auditor || $auditor === 0) {
-            $conditions['auditor'] = $auditor;
+        if (is_null($auditor)) {
+            $conditions['auditor'] = ['in',[0,1,2]];
+        } else {
+            switch ($auditor) {
+                case 0:
+                    $conditions['auditor'] = $auditor;
+                    break;
+                case 1:
+                    $conditions['auditor'] = $auditor;
+                    break;
+                case 2:
+                    $conditions['auditor'] = $auditor;
+                    break;
+                default:
+                    break;
+            }
         }
-        if ($status || $status === 0) {
-            $conditions['status'] = $status;
+        if (is_null($status)) {
+            $conditions['status'] = ['in',[0,1]];
+        } else {
+            switch ($status) {
+                case 0:
+                    $conditions['status'] = $status;
+                    break;
+                case 1:
+                    $conditions['status'] = $status;
+                    break;
+                default:
+                    break;
+            }
         }
 
         //返回结果
@@ -198,7 +234,7 @@ class User extends BasisController {
     }
 
     /**
-     *
+     * 等待审核列表
      */
     public function wait_auditor_entry() {
         //接收客户端提交的数据
@@ -393,8 +429,9 @@ class User extends BasisController {
 
         //返回数据
         $user = $this->user_model->where('id', $id)
-            ->field('company, stage, website, industry, legal_person, duty, mobile, phone, email, register_address, business_license, register_capital, license_scan, mailing_address, sales_volume, total_people, developer_people, patent, high_technology, service_direction, products_introduce, business_introduce, logo')
+            ->field('id, mobile')
             ->find();
+
         if ($user) {
             return json([
                 'code'      => '200',

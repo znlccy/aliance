@@ -11,6 +11,12 @@ namespace app\index\model;
 class Activity extends BasicModel {
 
     /**
+     * 自动写入读取时间
+     * @var string
+     */
+    protected $autoWriteTimestamp = 'datetime';
+
+    /**
      * 关联的数据表
      * @var string
      */

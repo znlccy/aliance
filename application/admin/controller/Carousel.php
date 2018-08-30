@@ -111,8 +111,19 @@ class Carousel extends BasisController {
         if ($publish_start && $publish_end) {
             $conditions['publish_time'] = ['between time', [$publish_start, $publish_end]];
         }
-        if ($status || $status === 0) {
-            $conditions['status'] = $status;
+        if (is_null($status)) {
+            $conditions['status'] = ['in',[0,1]];
+        } else {
+            switch ($status) {
+                case 0:
+                    $conditions['status'] = $status;
+                    break;
+                case 1:
+                    $conditions['status'] = $status;
+                    break;
+                default:
+                    break;
+            }
         }
 
         //返回数据

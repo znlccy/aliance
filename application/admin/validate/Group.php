@@ -36,7 +36,7 @@ class Group extends BasisValidate {
 
     //验证场景
     protected $scene = [
-        'entry'         => ['id' => 'number', 'name' => 'max:160', 'sort' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'page_size' => 'number', 'jump_page' => 'number'],
+        'entry'         => ['id' => 'number', 'name' => 'max:160', 'sort' => 'number|min:1', 'create_start' => 'date', 'create_end' => 'date', 'page_size' => 'number', 'jump_page' => 'number'],
         'save'          => ['id' => 'number', 'name' => 'require|max:160', 'sort' => 'require|number'],
         'detail'        => ['id' => 'require|number'],
         'delete'        => ['id' => 'require|number']

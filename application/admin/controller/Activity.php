@@ -136,8 +136,19 @@ class Activity extends BasisController {
         if ($register_start && $register_end) {
             $conditions['register'] = ['between', [$register_start, $register_end]];
         }
-        if ($status || $status === 0) {
-            $conditions['status'] = $status;
+        if (is_null($status)) {
+            $conditions['status'] = ['in',[0,1]];
+        } else {
+            switch ($status) {
+                case 0:
+                    $conditions['status'] = $status;
+                    break;
+                case 1:
+                    $conditions['status'] = $status;
+                    break;
+                default:
+                    break;
+            }
         }
         if ($address) {
             $conditions['address'] = ['like', '%' . $address . '%'];

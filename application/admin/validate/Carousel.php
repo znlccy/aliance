@@ -53,7 +53,7 @@ class Carousel extends BasisValidate {
 
     //验证场景
     protected $scene = [
-        'entry'         => ['id' => 'number', 'title' => 'max:80', 'url' => 'url', 'sort' => 'number', 'status' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'update_start' => 'date', 'update_end' => 'date', 'publish_start' => 'date', 'publish_end' => 'date'],
+        'entry'         => ['id' => 'number', 'title' => 'max:80', 'url' => 'url', 'sort' => 'number|min:1', 'status' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'update_start' => 'date', 'update_end' => 'date', 'publish_start' => 'date', 'publish_end' => 'date'],
         'save'          => ['id' => 'number', 'title' => 'require|max:80', 'url' => 'url', 'sort' => 'require|number', 'status' => 'require|number', 'publish_time' => 'date'],
         'detail'        => ['id' => 'require|number'],
         'delete'        => ['id' => 'require|number']

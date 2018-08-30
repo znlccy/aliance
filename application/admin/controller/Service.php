@@ -140,11 +140,35 @@ class Service extends BasicController {
         if ($price_start && $price_end) {
             $conditions['price'] = ['between',[$price_start, $price_end]];
         }
-        if ($recommend) {
-            $conditions['recommend'] = $recommend;
+
+        if (is_null($recommend)) {
+            $conditions['status'] = ['in',[0,1]];
+        } else {
+            switch ($recommend) {
+                case 0:
+                    $conditions['recommend'] = $recommend;
+                    break;
+                case 1:
+                    $conditions['recommend'] = $recommend;
+                    break;
+                default:
+                    break;
+            }
         }
-        if ($status || $status === 0) {
-            $conditions['status'] = $status;
+
+        if (is_null($status)) {
+            $conditions['status'] = ['in',[0,1]];
+        } else {
+            switch ($status) {
+                case 0:
+                    $conditions['status'] = $status;
+                    break;
+                case 1:
+                    $conditions['status'] = $status;
+                    break;
+                default:
+                    break;
+            }
         }
         if ($address) {
             $conditions['address'] = ['like', '%' . $address . '%'];

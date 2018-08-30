@@ -130,8 +130,19 @@ class Dynamic extends BasisController {
         if ($recommend || $recommend === 0) {
             $conditions['recommend'] = $recommend;
         }
-        if ($status || $status === 0) {
-            $conditions['status'] = $status;
+        if (is_null($status)) {
+            $conditions['status'] = ['in',[0,1]];
+        } else {
+            switch ($status) {
+                case 0:
+                    $conditions['status'] = $status;
+                    break;
+                case 1:
+                    $conditions['status'] = $status;
+                    break;
+                default:
+                    break;
+            }
         }
         if ($publisher) {
             $conditions['publisher'] = $publisher;

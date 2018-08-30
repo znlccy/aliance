@@ -55,6 +55,7 @@ class User extends BasisValidate {
         'entry' => ['id' => 'number', 'mobile'=> 'length:11|regex:mobile', 'page_size' => 'number', 'jump_page' => 'number', 'auditor' => 'number', 'status' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'login_start' => 'date', 'login_end' => 'date'],
         'wait_auditor_entry' => ['id' => 'number', 'mobile'=> 'length:11|regex:mobile', 'page_size' => 'number', 'jump_page' => 'number','status' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'login_start' => 'date', 'login_end' => 'date'],
         'create' => ['id' => 'number', 'mobile' => 'require|length:11|regex:mobile|unique:tb_user', 'password' => 'require|alphaDash|length:8,25', 'confirm_pass' => 'require|alphaDash|length:8,25|confirm:password'],
+        'modify' => ['id' => 'number', 'password' => 'require|alphaDash|length:8,25', 'confirm_pass' => 'require|alphaDash|length:8,25|confirm:password'],
         'update' => ['id' => 'require|number','mobile' => 'regex:mobile|length:8', 'username' => 'max:255', 'status' => 'number', 'email' => 'email', 'company' => 'max:255', 'career' => 'max:255', 'occupation' => 'max:255'],
         'detail' => ['id' => 'require|number'],
         'delete' => ['id' => 'require|number'],
