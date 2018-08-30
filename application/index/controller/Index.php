@@ -24,6 +24,12 @@ class Index extends BasicController {
     protected $dynamic_model;
 
     /**
+     * 声明动态分页器
+     * @var
+     */
+    protected $dynamic_page;
+
+    /**
      * 声明轮播模型
      * @var
      */
@@ -51,6 +57,7 @@ class Index extends BasicController {
         $this->dynamic_model = new DynamicModel();
         $this->carousel_model = new CarouselModel();
         $this->activity_model = new ActivityModel();
+        $this->dynamic_page = config('pagination');
         $this->user_model = new UserModel();
     }
 
@@ -61,6 +68,11 @@ class Index extends BasicController {
      */
     public function index() {
 
+        //接收客户端提交过来的数据
+        $column_id = request()->param('column_id');
+        $page_size = request()->param('page_size', $this->dynamic_page['PAGE_SIZE']);
+        $jump_page = request()->param('jump_page', $this->dynamic_page['JUMP_PAGE']);
+
         //轮播数据
         $carousel = $this->carousel_model
             ->where('status = 1')
@@ -69,11 +81,16 @@ class Index extends BasicController {
             ->limit(4)
             ->select();
 
+        //筛选条件
+        $condition['td.column_id'] = $column_id;
+
         //动态左侧数据
-        $dynamic_left = $this->dynamic_model
-            ->where('recommend = 1')
-            ->where('status = 1')
-            ->order('create_time', 'desc')
+        $dynamic_left = $this->dynamic_model->alias('td')
+            ->where('td.recommend = 1')
+            ->where('td.status = 1')
+            ->join('tb_column tc', 'td.column_id = tc.id')
+            ->order('td.create_time', 'desc')
+            ->field('td.title, td.picture, td.description, td.create_time, tc.name')
             ->limit(3)
             ->select();
 
@@ -82,16 +99,20 @@ class Index extends BasicController {
 
         //动态右侧数据
         if ($count<=3) {
-            $dynamic_right = $this->dynamic_model
-                ->order('create_time','desc')
-                ->order('id', 'desc')
+            $dynamic_right = $this->dynamic_model->alias('td')
+                ->order('td.create_time','desc')
+                ->order('td.id', 'desc')
+                ->join('tb_column tc', 'td.column_id = tc.id')
                 ->limit($count)
+                ->field('td.title,tc.name')
                 ->select();
         } else {
-            $dynamic_right = $this->dynamic_model
+            $dynamic_right = $this->dynamic_model->alias('td')
                 ->order('create_time','desc')
                 ->order('id', 'desc')
+                ->join('tb_column tc', 'td.column_id = tc.id')
                 ->limit('0', $count-3)
+                ->field('td.title,tc.name')
                 ->select();
         }
 
@@ -128,11 +149,23 @@ class Index extends BasicController {
         //封装数据
         $data = array_merge(['carousel' => $carousel, 'dynamic_left' => $dynamic_left, 'dynamic_right' => $dynamic_right, 'activity' => $activity, 'company' => $company]);
 
-        return json([
-            'code'      => '200',
-            'message'   => '获取数据成功',
-            'data'      => $data
-        ]);
+        //筛选类目
+        if (is_null($column_id)) {
+            return json([
+                'code'      => '200',
+                'message'   => '获取数据成功',
+                'data'      => $data
+            ]);
+        } else {
+            $dynamic = $this->dynamic_model
+                ->where('column_id', $column_id)
+                ->paginate($page_size, false, ['page' => $jump_page]);
+            return json([
+                'code'      => '200',
+                'message'   => '获取数据成功',
+                'data'      => $dynamic
+            ]);
+        }
     }
 
 }

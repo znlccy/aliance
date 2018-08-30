@@ -75,8 +75,10 @@ class Dynamic extends BasicController {
         }
 
         //实例化模型
-        $review = $this->dynamic_model->order('id', 'desc')
-            ->field('rich_text, recommend', true)
+        $review = $this->dynamic_model->alias('td')
+            ->order('td.id', 'desc')
+            ->join('tb_column tc', 'td.column_id = tc.id')
+            ->field('td.id, td.title, td.description, td.create_time, tc.name')
             ->paginate($page_size, false, ['page' => $jump_page]);
 
         /* 返回数据 */
