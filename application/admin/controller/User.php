@@ -558,38 +558,8 @@ class User extends BasisController {
      */
     public function company_spinner() {
 
-        //获取客户端提交过来的数据
-        $id = request()->param('id');
-
-        //验证数据
-        $validate_data = [
-            'id'        => $id
-        ];
-
-        //验证结果
-        $result = $this->user_validate->scene('company_spinner')->check($validate_data);
-        if (!$result) {
-            return json([
-                'code'      => '401',
-                'message'   => $this->user_validate->getError()
-            ]);
-        }
-
-        if (is_null($id)) {
-            //查询数据
-            $company = $this->user_model->where('auditor = 2')->field('id,company')->select();
-
-            //返回数据
-            if ($company) {
-                return json([
-                    'code'      => '200',
-                    'message'   => '获取公司下拉列表成功',
-                    'company'   => $company
-                ]);
-            }
-        } else {
-            $company = $this->user_model->where('id', $id)->field('id, company')->find();
-        }
+        //查询数据
+        $company = $this->user_model->where('auditor = 2')->field('id,company')->select();
 
         //返回数据
         if ($company) {
@@ -597,6 +567,11 @@ class User extends BasisController {
                 'code'      => '200',
                 'message'   => '获取公司下拉列表成功',
                 'company'   => $company
+            ]);
+        } else {
+            return json([
+                'code'      => '404',
+                'message'   => '获取公司下拉列表失败，没有数据'
             ]);
         }
     }
@@ -612,12 +587,18 @@ class User extends BasisController {
             ->field('id, name')
             ->select();
 
+
         //返回数据
         if ($group) {
             return json([
                 'code'      => '200',
                 'message'   => '获取分组下拉列表成功',
-                'group'   => $group
+                'group'     => $group
+            ]);
+        } else {
+            return json([
+                'code'      => '200',
+                'message'   => '获取分组下拉列表失败，没有数据'
             ]);
         }
     }
@@ -628,8 +609,8 @@ class User extends BasisController {
     public function add() {
 
         //获取客户端提交的数据
-        $user_id = request()->param('user_id');
-        $group_id = request()->param('group_id');
+        $user_id = request()->param('user_id/d');
+        $group_id = request()->param('group_id/d');
 
         //验证数据
         $validate_data = [

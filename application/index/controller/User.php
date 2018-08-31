@@ -17,6 +17,7 @@ use app\index\model\UserActivity as UserActivityModel;
 use app\index\model\Activity as ActivityModel;
 use app\index\model\Group as GroupModel;
 use app\index\model\UserGroup as UserGroupModel;
+use think\Config;
 use think\Request;
 use think\Session;
 
