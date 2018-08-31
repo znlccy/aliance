@@ -558,8 +558,38 @@ class User extends BasisController {
      */
     public function company_spinner() {
 
-        //查询数据
-        $company = $this->user_model->where('auditor = 2')->field('id,company')->select();
+        //获取客户端提交过来的数据
+        $id = request()->param('id');
+
+        //验证数据
+        $validate_data = [
+            'id'        => $id
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('company_spinner')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+
+        if (is_null($id)) {
+            //查询数据
+            $company = $this->user_model->where('auditor = 2')->field('id,company')->select();
+
+            //返回数据
+            if ($company) {
+                return json([
+                    'code'      => '200',
+                    'message'   => '获取公司下拉列表成功',
+                    'company'   => $company
+                ]);
+            }
+        } else {
+            $company = $this->user_model->where('id', $id)->field('id, company')->find();
+        }
 
         //返回数据
         if ($company) {
@@ -688,7 +718,7 @@ class User extends BasisController {
             ->where($conditions)
             ->join('tb_user tu', 'tu.id = gm.user_id')
             ->join('tb_group tg', 'tg.id = gm.group_id')
-            ->field('tu.company, tg.name, gm.create_time')
+            ->field('tu.id, tu.company, tg.name, gm.create_time')
             ->paginate($page_size, false, ['page' => $jump_page]);
 
         return json([

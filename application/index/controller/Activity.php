@@ -13,6 +13,7 @@ use app\index\model\Activity  as ActivityModel;
 use app\index\validate\Activity as ActivityValidate;
 use app\index\model\UserActivity as UserActivityModel;
 use think\Request;
+use think\Session;
 
 class Activity extends BasicController {
 

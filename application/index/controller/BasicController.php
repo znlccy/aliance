@@ -11,6 +11,7 @@ namespace app\index\controller;
 
 use think\Controller;
 use think\Request;
+use think\Session;
 
 class BasicController extends Controller {
     // 用户id
@@ -24,20 +25,20 @@ class BasicController extends Controller {
         'User' => ['login', 'register', 'recover_pass', 'change_pass'],
         'Service' => ['more', 'index', 'detail', 'category'],
         'Review' => ['index', 'detail'],
-        'Active' => ['index', 'introduce'],
+        'Activity' => ['index', 'detail'],
         'Index' => ['index'],
         'Verify' => ['attain'],
         'Sms' => ['attain'],
-        'Competition' => ['introduce'],
-        'Investor' => ['index'],
+        'Dynamic'  => ['index','spinner', 'detail'],
         'News' => ['index'],
-        'Team' => ['index'],
-        'Tutor' => ['index'],
-        'Forum' => ['index', 'introduce'],
-        'Sp' => ['index'],
         'Image' => ['upload']
     ];
 
+    /**
+     * 默认构造函数
+     * BasicController constructor.
+     * @param Request|null $request
+     */
     public function __construct(Request $request = null)
     {
         parent::__construct($request);

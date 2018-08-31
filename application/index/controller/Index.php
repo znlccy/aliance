@@ -90,7 +90,7 @@ class Index extends BasicController {
             ->where('td.status = 1')
             ->join('tb_column tc', 'td.column_id = tc.id')
             ->order('td.create_time', 'desc')
-            ->field('td.title, td.picture, td.description, td.create_time, tc.name')
+            ->field('td.id, td.title, td.picture, td.description, td.create_time, tc.name, tc.id as column_id')
             ->limit(3)
             ->select();
 
@@ -104,7 +104,7 @@ class Index extends BasicController {
                 ->order('td.id', 'desc')
                 ->join('tb_column tc', 'td.column_id = tc.id')
                 ->limit($count)
-                ->field('td.title,tc.name')
+                ->field('td.id,td.title,tc.name,tc.id as column_id')
                 ->select();
         } else {
             $dynamic_right = $this->dynamic_model->alias('td')
@@ -112,7 +112,7 @@ class Index extends BasicController {
                 ->order('id', 'desc')
                 ->join('tb_column tc', 'td.column_id = tc.id')
                 ->limit('0', $count-3)
-                ->field('td.title,tc.name')
+                ->field('td.id, td.title,tc.name,tc.id as column_id')
                 ->select();
         }
 
@@ -167,5 +167,4 @@ class Index extends BasicController {
             ]);
         }
     }
-
 }
