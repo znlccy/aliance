@@ -382,6 +382,7 @@ class User extends BasisController {
             'service_direction' => $service_direction,
             'products_introduce'=> $products_introduce,
             'business_introduce'=> $business_introduce,
+            'auditor'           => 1,
             'logo'              => $logo,
             'update_time'       => date('Y-m-d H:s:i', time()),
             'create_time'       => date('Y-m-d H:s:i', time())
@@ -395,9 +396,12 @@ class User extends BasisController {
                 'message'   => $this->user_validate->getError()
             ]);
         }
-
+        if (empty($id)) {
+            $apply_result = $this->user_model->save($validate_data);
+        } else {
+            $apply_result = $this->user_model->save($validate_data, ['id' => $id]);
+        }
         //返回数据
-        $apply_result = $this->user_model->save($validate_data, ['id' => $id]);
         if ($apply_result) {
             return json([
                 'code'      => '200',
@@ -430,6 +434,49 @@ class User extends BasisController {
         //返回数据
         $user = $this->user_model->where('id', $id)
             ->field('id, mobile')
+            ->find();
+
+        if ($user) {
+            return json([
+                'code'      => '200',
+                'message'   => '查询数据成功',
+                'data'      => $user
+            ]);
+        } else {
+            return json([
+                'code'      => '404',
+                'message'   => '查询数据失败,数据不存在'
+            ]);
+        }
+    }
+
+    /**
+     * 成员介绍api接口
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function introduce() {
+        //获取客户端提交的数据
+        $id = request()->param('id');
+
+        //验证数据
+        $validate_data = [
+            'id'            => $id
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('detail')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+
+        //返回数据
+        $user = $this->user_model->where('id', $id)
             ->find();
 
         if ($user) {

@@ -18,10 +18,11 @@ use app\index\model\Activity as ActivityModel;
 use app\index\model\Group as GroupModel;
 use app\index\model\UserGroup as UserGroupModel;
 use think\Config;
+use think\Controller;
 use think\Request;
 use think\Session;
 
-class User extends BasicController {
+class User extends Controller {
 
     /**
      * 声明用户模型
@@ -646,18 +647,30 @@ class User extends BasicController {
      * @throws \think\exception\DbException
      */
     public function index() {
+        /**
+         *
+         */
+        $user_group_list = $this->user_group_model->select();
 
-        $company = $this->user_group_model->alias('gm')
-            ->order('gm.group_id', 'desc')
-            ->join('tb_user tu', 'gm.user_id = tu.id')
-            ->join('tb_group tg', 'gm.group_id = tg.id')
-            ->select();
+        $user_group_list = [];
+        foreach ( $user_group_list as $value ){
+            $user_group_list[] = $value['group_id'];
+        }
 
-        if ($company) {
+        $group_data = $this->group_model->select();
+        for ( $i = 0; $i < count($group_data); $i++ ){
+            if (in_array($group_data[$i]['id'], $user_group_list)) {
+                $group_data[$i]['role_status'] = 1;
+            } else {
+                $group_data[$i]['role_status'] = 0;
+            }
+        }
+
+        if ($group_data) {
             return json([
                 'code'      => '200',
                 'message'   => '获取信息成功',
-                'data'      => $company
+                'data'      => $group_data
             ]);
         }
     }
@@ -763,5 +776,6 @@ class User extends BasicController {
             ]);
         }
     }
+
 
 }

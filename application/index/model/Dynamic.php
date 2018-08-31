@@ -21,4 +21,22 @@ class Dynamic extends BasicModel {
      * @var string
      */
     protected $table = 'tb_dynamic';
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function setRichtextAttr($value)
+    {
+        return htmlspecialchars($value);
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getRichtextAttr($value)
+    {
+        return htmlspecialchars_decode($value);
+    }
 }
