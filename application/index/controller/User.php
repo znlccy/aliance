@@ -641,30 +641,11 @@ class User extends Controller {
 
     /**
      * 用户成员列表
-     * @return mixed|void
+     * @return \think\response\Json
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    /*public function index() {
-
-        //获取分组之后的
-        $company = $this->user_group_model->alias('gm')
-            ->order('gm.group_id', 'desc')
-            ->join('tb_user tu', 'gm.user_id = tu.id')
-            ->join('tb_group tg', 'gm.group_id = tg.id')
-            ->field('gm.group_id, tu.id, tu.company, tu.logo, tg.name as group_name, tu.products_introduce')
-            ->select();
-
-        if ($company) {
-            return json([
-                'code'      => '200',
-                'message'   => '获取信息成功',
-                'data'      => $company
-            ]);
-        }
-    }*/
-
     public function index()
     {
 
