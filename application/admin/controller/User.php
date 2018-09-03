@@ -246,6 +246,7 @@ class User extends Controller {
         $login_start = request()->param('login_start');
         $login_end = request()->param('login_end');
         $status = request()->param('status');
+        $auditor = request()->param('auditor');
         $page_size = request()->param('page_size', $this->user_page['PAGE_SIZE']);
         $jump_page = request()->param('jump_page', $this->user_page['JUMP_PAGE']);
 
@@ -258,6 +259,7 @@ class User extends Controller {
             'login_start'   => $login_start,
             'login_end'     => $login_end,
             'status'        => $status,
+            'auditor'       => $auditor,
             'page_size'     => $page_size,
             'jump_page'     => $jump_page
         ];
@@ -285,9 +287,37 @@ class User extends Controller {
         if ($login_start && $login_end) {
             $conditions['update_time'] = ['between time', [$login_start, $login_end]];
         }
-        $conditions['auditor'] = ['in', [0,1,2]];
-        if ($status || $status === 0) {
-            $conditions['status'] = $status;
+        if (is_null($auditor)) {
+            $conditions['auditor'] = ['in',[0,1,2,3]];
+        } else {
+            switch ($auditor) {
+                case 0:
+                    $conditions['auditor'] = $auditor;
+                    break;
+                case 1:
+                    $conditions['auditor'] = $auditor;
+                    break;
+                case 2:
+                    $conditions['auditor'] = $auditor;
+                case 3:
+                    $conditions['auditor'] = $auditor;
+                default:
+                    break;
+            }
+        }
+        if (is_null($status)) {
+            $conditions['status'] = ['in',[0,1]];
+        } else {
+            switch ($status) {
+                case 0:
+                    $conditions['status'] = $status;
+                    break;
+                case 1:
+                    $conditions['status'] = $status;
+                    break;
+                default:
+                    break;
+            }
         }
 
         //返回结果
@@ -566,7 +596,7 @@ class User extends Controller {
             case 0:
                 for($i=0; $i< count($id); $i++) {
                     $data['id'] = (int)$id[$i];
-                    $data['auditor'] = 0;
+                    $data['auditor'] = 3;
                     $operator_result = $this->user_model->update($data);
                 }
                 //发送短信提醒
