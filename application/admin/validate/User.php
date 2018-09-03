@@ -62,8 +62,6 @@ class User extends BasisValidate {
         'auditor'  => ['id' => 'require|array','type_id' => 'require|number|in:0,1','reason' => 'min:6'],
         'save'   => ['id' => 'number', 'company' => 'require|max:255', 'stage' => 'require|max:255', 'website' => 'url', 'industry' => 'max:255', 'legal_person' => 'require|max:255', 'duty' => 'max:255', 'mobile' => 'require|length:11|regex:mobile', 'phone' => 'max:255', 'email' => 'require|email', 'register_address' => 'require|max:255', 'business_license' => 'max:255', 'register_capital' => 'require|number', 'license_scan' => 'require', 'mailing_address' => 'max:255', 'sales_volume' => 'max:255', 'total_people' => 'number', 'developer_people' => 'number', 'patent' => 'max:255', 'high_technology' => 'require|number', 'service_direction'=> 'max:255', 'products_introduce' => 'min:300', 'business_introduce' => 'min:30', 'logo' => 'require'],
         'add'    => ['user_id' => 'require|number', 'group_id' => 'require|number'],
-        'index'  => ['user_id' => 'number', 'group_id' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'page_size' => 'number', 'jump_page' => 'number'],
-        'company_spinner'   => ['id' => 'number'],
-        'group_spinner'     => ['id' => 'number']
+        'index'  => ['user_id' => 'number', 'group_id' => 'number', 'create_start' => 'date', 'create_end' => 'date', 'page_size' => 'number', 'jump_page' => 'number']
     ];
 }

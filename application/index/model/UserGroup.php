@@ -22,4 +22,23 @@ class UserGroup extends BasicModel {
      * @var string
      */
     protected $table = 'tb_user_group';
+
+
+    /**
+     * @return \think\model\relation\HasOne
+     * 关联用户
+     */
+    public function user()
+    {
+        return $this->hasOne('User', 'id', 'user_id');
+    }
+
+    /**
+     * @return \think\model\relation\HasOne
+     * 关联用户分组
+     */
+    public function userGroup()
+    {
+        return $this->hasOne('Group', 'id', 'group_id');
+    }
 }

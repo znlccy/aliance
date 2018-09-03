@@ -18,9 +18,9 @@ use app\index\model\Activity as ActivityModel;
 use app\index\model\Group as GroupModel;
 use app\index\model\UserGroup as UserGroupModel;
 use think\Config;
-use think\Controller;
 use think\Request;
 use think\Session;
+use think\Controller;
 
 class User extends Controller {
 
@@ -646,33 +646,56 @@ class User extends Controller {
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function index() {
-        /**
-         *
-         */
-        $user_group_list = $this->user_group_model->select();
+    /*public function index() {
 
-        $user_group_list = [];
-        foreach ( $user_group_list as $value ){
-            $user_group_list[] = $value['group_id'];
-        }
+        //获取分组之后的
+        $company = $this->user_group_model->alias('gm')
+            ->order('gm.group_id', 'desc')
+            ->join('tb_user tu', 'gm.user_id = tu.id')
+            ->join('tb_group tg', 'gm.group_id = tg.id')
+            ->field('gm.group_id, tu.id, tu.company, tu.logo, tg.name as group_name, tu.products_introduce')
+            ->select();
 
-        $group_data = $this->group_model->select();
-        for ( $i = 0; $i < count($group_data); $i++ ){
-            if (in_array($group_data[$i]['id'], $user_group_list)) {
-                $group_data[$i]['role_status'] = 1;
-            } else {
-                $group_data[$i]['role_status'] = 0;
-            }
-        }
-
-        if ($group_data) {
+        if ($company) {
             return json([
                 'code'      => '200',
                 'message'   => '获取信息成功',
-                'data'      => $group_data
+                'data'      => $company
             ]);
         }
+    }*/
+
+    public function index()
+    {
+
+        $datas = $this->user_group_model->with(['userGroup' => function($query) {
+            $query->field('id,name');
+        }, 'user' => function ($query) {
+//            $query->field('id,company,logo,products_introduce');
+        }])
+            ->group('group_id,user_id')
+            ->select();
+
+        $groups = $this->user_group_model->with(['userGroup' => function($query) {
+            $query->field('id,name');
+        }])->group('group_id')
+            ->select();
+
+        $group_user = [];
+        foreach ($groups as $k =>$group) {
+            $group_user[$k]['group'] = $group->user_group->toArray();
+            foreach ($datas as $i => $data) {
+                if ($data->group_id === $group->group_id) {
+                    $group_user[$k]['group']['user'][$i] = $data->user;
+                }
+            }
+        }
+
+        return json([
+            'code'      => '200',
+            'message'   => '获取信息成功',
+            'data'      => $group_user
+        ]);
     }
 
     /**
@@ -776,6 +799,5 @@ class User extends Controller {
             ]);
         }
     }
-
 
 }
