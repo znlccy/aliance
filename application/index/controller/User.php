@@ -652,7 +652,7 @@ class User extends Controller {
         $datas = $this->user_group_model->with(['userGroup' => function($query) {
             $query->field('id,name');
         }, 'user' => function ($query) {
-//            $query->field('id,company,logo,products_introduce');
+            $query->field('id,company,logo,products_introduce');
         }])
             ->group('group_id,user_id')
             ->select();
@@ -667,7 +667,7 @@ class User extends Controller {
             $group_user[$k]['group'] = $group->user_group->toArray();
             foreach ($datas as $i => $data) {
                 if ($data->group_id === $group->group_id) {
-                    $group_user[$k]['group']['user'][$i] = $data->user;
+                    $group_user[$k]['group']['user'][] = $data->user;
                 }
             }
         }

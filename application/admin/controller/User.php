@@ -13,9 +13,10 @@ use app\admin\model\User as UserModel;
 use app\admin\model\Group as GroupModel;
 use app\admin\model\UserGroup as UserGroupModel;
 use app\admin\validate\User as UserValidate;
+use think\Controller;
 use think\Request;
 
-class User extends BasisController {
+class User extends Controller {
 
     /**
      * 声明用户模型
@@ -284,7 +285,7 @@ class User extends BasisController {
         if ($login_start && $login_end) {
             $conditions['update_time'] = ['between time', [$login_start, $login_end]];
         }
-        $conditions['auditor'] = 1;
+        $conditions['auditor'] = ['in', [0,1,2]];
         if ($status || $status === 0) {
             $conditions['status'] = $status;
         }
@@ -292,7 +293,7 @@ class User extends BasisController {
         //返回结果
         $user = $this->user_model->where($conditions)
             ->field('id, mobile, create_time, login_time, auditor, status')
-            ->paginate($page_size, false, ['jump_page' => $jump_page]);
+            ->paginate($page_size, false, ['page' => $jump_page]);
 
         if ($user) {
             return json([
