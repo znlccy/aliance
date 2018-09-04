@@ -468,7 +468,7 @@ class User extends Controller {
 
         $information = $this->information_model
             ->alias('in')
-            ->field('in.id, in.title, in.publish_time, a.nickname as publisher')
+            ->field('in.id, in.title, in.publish_time, a.nick_name as publisher')
             ->join('tb_admin a', 'in.publisher = a.id')
             ->paginate($page_size, false, ['page' => $jump_page])->each(function($item, $key) use ($info){
                 if (in_array($item['id'], $info)) {
@@ -512,7 +512,7 @@ class User extends Controller {
         $information = $this->information_model->alias('in')
             ->where('in.id', '=', $id)
             ->join('tb_admin a', 'in.publisher = a.id')
-            ->field('in.id, in.title, in.publish_time, in.richtext, a.nickname as publisher')
+            ->field('in.id, in.title, in.publish_time, in.rich_text, a.nick_name as publisher')
             ->find();
 
         if ( empty($information) ){
