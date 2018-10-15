@@ -86,35 +86,49 @@ class Index extends BasicController {
 
         //动态左侧数据
         $dynamic_left = $this->dynamic_model->alias('td')
-            ->where('td.recommend = 1')
             ->where('td.status = 1')
             ->join('tb_column tc', 'td.column_id = tc.id')
-            ->order('td.create_time', 'desc')
+            ->order('td.recommend', 'desc')
+            ->order('td.id', 'desc')
             ->field('td.id, td.title, td.picture, td.description, td.create_time, tc.name, tc.id as column_id')
             ->limit(3)
             ->select();
 
+
+        //获取已经展示过的新闻内容
+        foreach ($dynamic_left as $item) {
+            $dynamic_left_list[] = $item['id'];
+        }
         //获得记录数
         $count = $this->dynamic_model->count();
 
+
+        $dynamic_right = $this->dynamic_model->alias('td')
+            ->where('td.status = 1')
+            ->where('td.id', 'not in', $dynamic_left_list)
+            ->order('td.recommend', 'desc')
+            ->order('td.id', 'desc')
+            ->join('tb_column tc', 'td.column_id = tc.id')
+            ->limit(15)
+            ->field('td.id,td.title,tc.name,tc.id as column_id')
+            ->select();
+
         //动态右侧数据
-        if ($count<=3) {
-            $dynamic_right = $this->dynamic_model->alias('td')
-                ->order('td.create_time','desc')
-                ->order('td.id', 'desc')
-                ->join('tb_column tc', 'td.column_id = tc.id')
-                ->limit($count)
-                ->field('td.id,td.title,tc.name,tc.id as column_id')
-                ->select();
-        } else {
-            $dynamic_right = $this->dynamic_model->alias('td')
-                ->order('create_time','desc')
-                ->order('id', 'desc')
-                ->join('tb_column tc', 'td.column_id = tc.id')
-                ->limit('0', $count-3)
-                ->field('td.id, td.title,tc.name,tc.id as column_id')
-                ->select();
-        }
+//        if ($count<=3) {
+//            $dynamic_right = $this->dynamic_model->alias('td')
+//                ->order('td.id', 'desc')
+//                ->join('tb_column tc', 'td.column_id = tc.id')
+//                ->limit($count)
+//                ->field('td.id,td.title,tc.name,tc.id as column_id')
+//                ->select();
+//        } else {
+//            $dynamic_right = $this->dynamic_model->alias('td')
+//                ->order('id', 'desc')
+//                ->join('tb_column tc', 'td.column_id = tc.id')
+//                ->limit('0', $count-3)
+//                ->field('td.id, td.title,tc.name,tc.id as column_id')
+//                ->select();
+//        }
 
         //活动数据
         $activity = $this->activity_model
@@ -140,10 +154,14 @@ class Index extends BasicController {
 
         //企业数据
         $company = $this->user_model
-            ->where('status = 1')
-            ->where('auditor = 1')
-            ->order('id', 'desc')
-            ->field('id,company,logo')
+            -> alias('tu')
+            ->where('tu.status = 1')
+            ->where('tu.auditor = 2')
+            ->order('tg.sort', 'desc')
+            ->order('tu.id', 'desc')
+            ->field('tu.id, tu.company, tu.logo')
+            ->join('tb_user_group tug', 'tug.user_id = tu.id')
+            ->join('tb_group tg', 'tg.id = tug.group_id')
             ->select();
 
         //封装数据

@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-4a95"],{"56da":function(n,e,a){},"8a43":function(n,e,a){"use strict";a.r(e);var t=function(){var n=this,e=n.$createElement,a=n._self._c||e;return a("div",[n._v("\n    推广渠道统计模块\n")])},c=[],u={name:"Apply"},i=u,f=(a("f3b4"),a("2877")),o=Object(f["a"])(i,t,c,!1,null,"3ddaf6f2",null);o.options.__file="channel.vue";e["default"]=o.exports},f3b4:function(n,e,a){"use strict";var t=a("56da"),c=a.n(t);c.a}}]);
+//# sourceMappingURL=chunk-4a95.9eab542f.js.map

@@ -61,11 +61,13 @@ class Dynamic extends BasicController {
         /* 获取客户端提交过来的数据 */
         $page_size = request()->param('page_size', $this->dynamic_page['PAGE_SIZE']);
         $jump_page = request()->param('jump_page', $this->dynamic_page['JUMP_PAGE']);
+        $column_id = request()->param('column_id');
 
         /* 验证规则 */
         $validate_data = [
             'page_size'         => $page_size,
             'jump_page'         => $jump_page,
+            'column_id'         => $column_id,
         ];
 
         //实例化验证器
@@ -75,11 +77,21 @@ class Dynamic extends BasicController {
         }
 
         //实例化模型
-        $review = $this->dynamic_model->alias('td')
-            ->order('td.id', 'desc')
-            ->join('tb_column tc', 'td.column_id = tc.id')
-            ->field('td.id, td.title, td.description, td.create_time, td.picture, tc.name, tc.id as column_id')
-            ->paginate($page_size, false, ['page' => $jump_page]);
+
+        if ( empty($column_id) ){
+            $review = $this->dynamic_model->alias('td')
+                ->order('td.id', 'desc')
+                ->join('tb_column tc', 'td.column_id = tc.id')
+                ->field('td.id, td.title, td.description, td.create_time, td.picture, tc.name, tc.id as column_id')
+                ->paginate($page_size, false, ['page' => $jump_page]);
+        }else{
+            $review = $this->dynamic_model->alias('td')
+                ->order('td.id', 'desc')
+                ->where('td.column_id', $column_id)
+                ->join('tb_column tc', 'td.column_id = tc.id')
+                ->field('td.id, td.title, td.description, td.create_time, td.picture, tc.name, tc.id as column_id')
+                ->paginate($page_size, false, ['page' => $jump_page]);
+        }
 
         /* 返回数据 */
         return json([

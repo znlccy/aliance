@@ -657,16 +657,14 @@ class User extends Controller {
             ->group('group_id,user_id')
             ->select();
 
-        $groups = $this->user_group_model->with(['userGroup' => function($query) {
-            $query->field('id,name');
-        }])->group('group_id')
-            ->select();
-
+        $group_ids = $this->user_group_model->group('group_id')
+            ->column('group_id');
+        $groups = GroupModel::whereIn('id', $group_ids)->order('sort', 'desc')->field('id,name')->select();
         $group_user = [];
         foreach ($groups as $k =>$group) {
-            $group_user[$k]['group'] = $group->user_group->toArray();
+            $group_user[$k]['group'] = $group->toArray();
             foreach ($datas as $i => $data) {
-                if ($data->group_id === $group->group_id) {
+                if ($data->group_id === $group->id) {
                     $group_user[$k]['group']['user'][] = $data->user;
                 }
             }

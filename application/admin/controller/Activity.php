@@ -195,6 +195,7 @@ class Activity extends BasisController {
         $content     = request()->param('content');
         $recommend   = request()->param('recommend', 0);
         $picture     = request()->file('picture');
+        $start       = request()->param('start');
         $limit       = request()->param('limit');
         $register    = request()->param('register', 0);
         $status      = request()->param('status', 1);
@@ -222,6 +223,7 @@ class Activity extends BasisController {
             'content'     => $content,
             'recommend'   => $recommend,
             'picture'     => $picture,
+            'start'       => $start,
             'limit'       => $limit,
             'register'    => $register,
             'status'      => $status,

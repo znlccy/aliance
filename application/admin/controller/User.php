@@ -218,7 +218,7 @@ class User extends Controller {
         //返回结果
         $user = $this->user_model->where($conditions)
             ->field('id, mobile, create_time, login_time, auditor, status')
-            ->paginate($page_size, false, ['jump_page' => $jump_page]);
+            ->paginate($page_size, false, ['page' => $jump_page]);
 
         if ($user) {
             return json([
@@ -547,7 +547,40 @@ class User extends Controller {
         }
 
         //返回结果
-        $delete = $this->user_model->where('id', $id)->delete();
+        $delete = $this->user_model->where('user_id', $id)->delete();
+        if ($delete) {
+            return json([
+                'code'      => '200',
+                'message'   => '删除数据成功'
+            ]);
+        } else {
+            return json([
+                'code'      => '401',
+                'message'   => '删除数据失败'
+            ]);
+        }
+    }
+
+    public function user_group_delete() {
+        //获取客户端提交过来的数据
+        $id = request()->param('id');
+
+        //验证数据
+        $validate_data = [
+            'id'            => $id
+        ];
+
+        //验证结果
+        $result = $this->user_validate->scene('delete')->check($validate_data);
+        if (!$result) {
+            return json([
+                'code'      => '401',
+                'message'   => $this->user_validate->getError()
+            ]);
+        }
+
+        //返回结果
+        $delete = $this->user_group_model->where('user_id', $id)->delete();
         if ($delete) {
             return json([
                 'code'      => '200',
