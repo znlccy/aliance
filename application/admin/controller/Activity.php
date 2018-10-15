@@ -19,7 +19,7 @@ use think\Request;
  * Class Activity
  * @package app\admin\controller
  */
-class Activity extends Controller {
+class Activity extends BasisController {
 
     /**
      * 声明活动模型
