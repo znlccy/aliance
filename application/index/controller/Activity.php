@@ -215,6 +215,13 @@ class Activity extends BasicController {
         //整理活动状态
         $now_time = date('Y-m-d h:i:s', time());
 
+        if ($active_info['start'] > $active_info['limit']) {
+            return json([
+                'code'      => '405',
+                'message'   => '起始人数大于限制人数'
+            ]);
+        }
+
         if ( $active_info['limit'] != 0 ){
             if ( $active_info['limit'] <= $active_info['register'] ){
                 return json(['code' => '400', 'message' => '报名人数已满']);

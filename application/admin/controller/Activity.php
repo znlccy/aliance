@@ -12,13 +12,14 @@ namespace app\admin\controller;
 use app\admin\model\Activity as ActivityModel;
 use app\admin\validate\Activity as ActivityValidate;
 use app\admin\model\UserActivity as UserActivityModel;
+use think\Controller;
 use think\Request;
 
 /**
  * Class Activity
  * @package app\admin\controller
  */
-class Activity extends BasisController {
+class Activity extends Controller {
 
     /**
      * 声明活动模型
