@@ -114,6 +114,9 @@ class Activity extends BasicController {
             return json(['code' => '401', 'message' => '活动不存在']);
         }
 
+        $active_info['register'] = intval($active_info['start']) + intval($active_info['register']);
+        $active_info['limit'] = intval($active_info['limit']);
+
         //整理活动状态
         $now_time = date('Y-m-d h:i:s', time());
         $active_status = 4; //正在报名中，默认值
