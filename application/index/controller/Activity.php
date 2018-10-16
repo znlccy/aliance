@@ -110,6 +110,9 @@ class Activity extends BasicController {
         //获取该活动消息
         $active_info = $this->activity_model->where('id', '=', $id)->find();
 
+        $active_info['register'] = intval($active_info['start']) + intval($active_info['register']);
+        $active_info['limit'] = intval($active_info['limit']);
+
         if ( empty($active_info) || $active_info['status'] == 0 ){
             return json(['code' => '401', 'message' => '活动不存在']);
         }
